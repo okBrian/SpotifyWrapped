@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'spotify.apps.SpotifyConfig',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -47,9 +50,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'server.urls'
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # React frontend
+]
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+CORS_ALLOW_CREDENTIALS = True 
 
 TEMPLATES = [
     {

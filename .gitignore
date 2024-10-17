@@ -163,3 +163,5 @@ cython_debug/
 
 # environment 🤫
 .env/
+
+server/spotify/credentials.py
