@@ -22,18 +22,21 @@ def update_or_create_user_tokens(session_id, access_token, token_type, expires_i
         tokens.expires_in = expires_in
         tokens.token_type = token_type
         tokens.save(update_fields=['access_token', 'refresh_token', 'expires_in', 'token_type'])
+        print('updating')
     else:
         tokens = SpotifyToken(user=session_id, access_token=access_token, refresh_token=refresh_token, token_type=token_type, expires_in=expires_in)
         tokens.save()
+        print('created token')
 
 def is_spotify_authenticated(session_id):
     tokens = get_user_tokens(session_id)
     if tokens:
+        print('token exists in auth')
         expiry = tokens.expires_in
         if expiry <= timezone.now():
             refresh_spotify_token(session_id)
         return True
-
+    print('token does not exist in SpotifyToken')
     return False
 
 def refresh_spotify_token(session_id):
