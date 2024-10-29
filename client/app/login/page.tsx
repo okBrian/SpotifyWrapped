@@ -16,11 +16,26 @@ const SpotifyLogin: React.FC = () => {
                 console.log('Auth URL fetched:', data.url);
             } catch (error) {
                 console.error('Error fetching auth URL:', error);
-                console.log("Error happend fetching")
+                console.log("Error occurred fetching")
             }
         };
 
         fetchAuthUrl();
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`http://localhost:8000/spotify/get-data/${'artists'}`, {
+                    credentials: 'include', // Include credentials (cookies) in the request
+                });
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                console.log("Error occurred fetching")
+            }
+        };
+
+        fetchData();
     }, []);
 
     // Check if the user is authenticated when the component mounts
