@@ -4,11 +4,11 @@ import UserBlock from "./UserBlock";
 
 export default function Home() {
   return (
-    <div className="w-[40rem] max-w-full pt-16">
+    <>
       <div className="flex mb-8">
         <div className="flex flex-col grow">
           <UserBlock username="John Doe" className="grow mb-16" />
-          <div className="flex flex-wrap gap-1 text-3xl">
+          <div className="flex flex-wrap gap-2 text-3xl">
             <p>Your</p>
             <p className="text-secondary">
               Top 5
@@ -33,11 +33,11 @@ export default function Home() {
         </div>
       </div>
       
-      <div className="flex gap-2 overflow-x-scroll">
+      <div className="flex gap-4 overflow-x-scroll px-3 py-6">
         {[...Array(5)].map((_, i) =>
           <ArtistBlock key={i} num={i + 1} artist="John Doe" />
         )}
       </div>
-    </div>
+    </>
   )
 }
