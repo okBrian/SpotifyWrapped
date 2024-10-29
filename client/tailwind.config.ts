@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-const {nextui} = require("@nextui-org/react");
+const { nextui } = require("@nextui-org/react");
 
 const config: Config = {
   content: [
@@ -20,6 +20,9 @@ const config: Config = {
         "primary": "#BB86FC",
         "variant": "#3700B3",
         "secondary": "#03DAC6",
+        "spotify-green": "#1DB954",
+        "faint-gray-dark": "#2d2d2d",
+        "faint-gray-light": "#dedede",
       },
     },
   },
