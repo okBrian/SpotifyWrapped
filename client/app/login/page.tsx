@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 const SpotifyLogin: React.FC = () => {
     const [authUrl, setAuthUrl] = useState<string | null>(null);
+    const [displayName, setDisplayName] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
     // Fetch the authentication URL when the component mounts
@@ -31,6 +32,7 @@ const SpotifyLogin: React.FC = () => {
                     credentials: 'include', // Include credentials (cookies) in the request
                 });
                 const data = await response.json();
+                setDisplayName(data.display_name);
 
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -82,7 +84,7 @@ const SpotifyLogin: React.FC = () => {
                     )}
                 </div>
             ) : (
-                <p style={{fontSize: '18px', color: 'green'}}>You are logged in with Spotify!</p>
+                <p style={{fontSize: '18px', color: 'green'}}>Welcome, {displayName}! You are logged in with Spotify!</p>
             )}
         </div>
     );
