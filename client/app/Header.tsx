@@ -19,14 +19,15 @@ export default function Header(props: {
         <Switch
           isSelected={dark}
           onValueChange={setDark}
+          size="lg"
           color="primary"
           thumbIcon={dark ? (
-            <LuMoon />
+            <LuMoon size="20" />
           ) : (
-            <LuSun />
+            <LuSun size="20" />
           )}
           classNames={{
-            wrapper: "border-2"
+            wrapper: `border-2 transition duration-300 ${dark ? "border-white" : "bg-slate-300 border-black"}`,
           }}
         >
           Dark mode
