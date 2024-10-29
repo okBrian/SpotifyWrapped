@@ -11,7 +11,7 @@ export default function DarkModeProvider(props: {
   const [dark, setDark] = useState(true);
 
   return (
-    <div className={"w-full h-full transition" + (dark
+    <div className={"w-full h-full flex flex-col items-center transition" + (dark
         ? " dark bg-bg text-white border-dark-border"
         : " bg-white text-surface border-light-border")}>
       <Header dark={dark} setDark={setDark} />

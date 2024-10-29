@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 
-export default function() {
+export default function Login() {
   const [authUrl, setAuthUrl] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
