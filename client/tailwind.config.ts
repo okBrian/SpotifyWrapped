@@ -20,6 +20,7 @@ const config: Config = {
         "primary": "#BB86FC",
         "variant": "#3700B3",
         "secondary": "#03DAC6",
+        "spotify-green": "#1DB954",
       },
     },
   },
