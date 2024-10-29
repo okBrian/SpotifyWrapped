@@ -1,4 +1,5 @@
 import json
+from statistics import quantiles
 from urllib.error import HTTPError
 
 from django.shortcuts import render, redirect
@@ -66,8 +67,10 @@ class DataView(APIView):
     def get(self, request, query):
         session_id = self.request.session.session_key
         authenticated = is_spotify_authenticated(session_id)
-        print("YEEEEEEE")
-        print(query)
+
+        # query formatting since requests need to be passed with slashes in them
+        query = query.replace('|', '/')
+
         if authenticated:
             user_tokens = get_user_tokens(session_id)
             print(user_tokens.access_token)                                           
@@ -76,6 +79,11 @@ class DataView(APIView):
                 'Authorization': "Bearer " + user_tokens.access_token
             }
             # print(headers)
-            data = get(('https://api.spotify.com/v1/me/top/' + query), headers=headers).json()
-            print(data)
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+            try:
+                data = get(('https://api.spotify.com/v1/' + query), headers=headers).json()
+                print("data fetch successful")
+                return Response(data, status=status.HTTP_200_OK)
+            except:
+                return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'User not authenticated'}, status=status.HTTP_403_FORBIDDEN)

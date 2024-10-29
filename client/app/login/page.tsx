@@ -25,10 +25,13 @@ const SpotifyLogin: React.FC = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            const query = "me"
             try {
-                const response = await fetch(`http://localhost:8000/spotify/get-data/${'artists'}`, {
+                const response = await fetch(`http://localhost:8000/spotify/get-data/${query}`, {
                     credentials: 'include', // Include credentials (cookies) in the request
                 });
+                const data = await response.json();
+
             } catch (error) {
                 console.error('Error fetching user data:', error);
                 console.log("Error occurred fetching")
@@ -79,7 +82,7 @@ const SpotifyLogin: React.FC = () => {
                     )}
                 </div>
             ) : (
-                <p style={{ fontSize: '18px', color: 'green' }}>You are logged in with Spotify!</p>
+                <p style={{fontSize: '18px', color: 'green'}}>You are logged in with Spotify!</p>
             )}
         </div>
     );
