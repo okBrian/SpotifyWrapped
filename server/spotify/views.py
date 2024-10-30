@@ -1,16 +1,20 @@
+import json
+from statistics import quantiles
+from urllib.error import HTTPError
+
 from django.shortcuts import render, redirect
 from .credentials import REDIRECT_URI, CLIENT_SECRET, CLIENT_ID
 from rest_framework.views import APIView
-from requests import Request, post
+from requests import Request, post, get
 from rest_framework import status
 from rest_framework.response import Response
-from .util import update_or_create_user_tokens, is_spotify_authenticated
+from .util import update_or_create_user_tokens, is_spotify_authenticated, get_user_tokens
 from django.http import HttpResponseRedirect
 
 
 class AuthURL(APIView):
     def get(self, request, format=None):
-        scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing' # can add more scopes when needed
+        scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing user-top-read' # can add more scopes when needed
 
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
             'scope': scopes,
@@ -58,3 +62,28 @@ class IsAuthenticated(APIView):
         print("Session Key:", session_key)  # This should not be None
         print("Is Authenticated:", is_authenticated)
         return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
+
+class DataView(APIView):
+    def get(self, request, query):
+        session_id = self.request.session.session_key
+        authenticated = is_spotify_authenticated(session_id)
+
+        # query formatting since requests need to be passed with slashes in them
+        query = query.replace('|', '/')
+
+        if authenticated:
+            user_tokens = get_user_tokens(session_id)
+            print(user_tokens.access_token)                                           
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer " + user_tokens.access_token
+            }
+            # print(headers)
+            try:
+                data = get(('https://api.spotify.com/v1/' + query), headers=headers).json()
+                print("data fetch successful")
+                return Response(data, status=status.HTTP_200_OK)
+            except:
+                return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'User not authenticated'}, status=status.HTTP_403_FORBIDDEN)

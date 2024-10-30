@@ -3,9 +3,26 @@
 import { useEffect, useState } from 'react';
 
 
+
 export default function Login() {
-  const [authUrl, setAuthUrl] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+    const [authUrl, setAuthUrl] = useState<string | null>(null);
+    const [displayName, setDisplayName] = useState<string | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+    // Fetch the authentication URL when the component mounts
+    useEffect(() => {
+        const fetchAuthUrl = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/spotify/get-auth-url');
+                const data = await response.json();
+                setAuthUrl(data.url);
+                console.log('Auth URL fetched:', data.url);
+            } catch (error) {
+                console.error('Error fetching auth URL:', error);
+                console.log("Error occurred fetching")
+            }
+        };
 
   // Fetch the authentication URL when the component mounts
   useEffect(() => {
@@ -21,8 +38,29 @@ export default function Login() {
       }
     };
 
+
     fetchAuthUrl();
   }, []);
+      
+  useEffect(() => {
+      const fetchData = async () => {
+          const query = "me"
+          try {
+              const response = await fetch(`http://localhost:8000/spotify/get-data/${query}`, {
+                  credentials: 'include', // Include credentials (cookies) in the request
+              });
+              const data = await response.json();
+              setDisplayName(data.display_name);
+
+          } catch (error) {
+              console.error('Error fetching user data:', error);
+              console.log("Error occurred fetching")
+          }
+      };
+
+      fetchData();
+  }, []);
+
 
   // Check if the user is authenticated when the component mounts
   useEffect(() => {
@@ -37,7 +75,7 @@ export default function Login() {
         console.error('Error checking authentication:', error);
       }
     };
-
+    
     checkAuthentication();
   }, []);
 
@@ -58,7 +96,7 @@ export default function Login() {
           )}
         </div>
       ) : (
-        <p className="text-xl font-green-500">You are logged in with Spotify!</p>
+        <p className="text-xl font-green-500">Welcome, {displayName}! You are logged in with Spotify!</p>
       )}
     </div>
   );
