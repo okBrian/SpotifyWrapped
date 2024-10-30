@@ -10,22 +10,9 @@ export default function Login() {
     const [displayName, setDisplayName] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
+
     // Fetch the authentication URL when the component mounts
     useEffect(() => {
-        const fetchAuthUrl = async () => {
-            try {
-                const response = await fetch('http://localhost:8000/spotify/get-auth-url');
-                const data = await response.json();
-                setAuthUrl(data.url);
-                console.log('Auth URL fetched:', data.url);
-            } catch (error) {
-                console.error('Error fetching auth URL:', error);
-                console.log("Error occurred fetching")
-            }
-        };
-
-  // Fetch the authentication URL when the component mounts
-  useEffect(() => {
     const fetchAuthUrl = async () => {
       try {
         const response = await fetch('http://localhost:8000/spotify/get-auth-url');
@@ -40,9 +27,9 @@ export default function Login() {
 
 
     fetchAuthUrl();
-  }, []);
+    }, []);
       
-  useEffect(() => {
+    useEffect(() => {
       const fetchData = async () => {
           const query = "me"
           try {
@@ -59,11 +46,11 @@ export default function Login() {
       };
 
       fetchData();
-  }, []);
+    }, []);
 
 
-  // Check if the user is authenticated when the component mounts
-  useEffect(() => {
+    // Check if the user is authenticated when the component mounts
+    useEffect(() => {
     const checkAuthentication = async () => {
       try {
         const response = await fetch('http://localhost:8000/spotify/is-authenticated', {
@@ -75,11 +62,11 @@ export default function Login() {
         console.error('Error checking authentication:', error);
       }
     };
-    
-    checkAuthentication();
-  }, []);
 
-  return (
+    checkAuthentication();
+    }, []);
+
+    return (
     <div className="h-full p-6 text-center">
       <h1 className="text-3xl mb-10">
         Spotify Login
@@ -99,5 +86,5 @@ export default function Login() {
         <p className="text-xl font-green-500">Welcome, {displayName}! You are logged in with Spotify!</p>
       )}
     </div>
-  );
+    );
 };
