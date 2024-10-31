@@ -21,7 +21,7 @@ export default function Login() {
         console.log('Auth URL fetched:', data.url);
       } catch (error) {
         console.error('Error fetching auth URL:', error);
-        console.log("Error happend fetching")
+        console.log("Error happened fetching")
       }
     };
 

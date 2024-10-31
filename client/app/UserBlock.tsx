@@ -1,12 +1,13 @@
 export default function UserBlock(props: {
-  username: String,
-  className?: String,
+    username: string,
+    className?: string,
+    userImage: string,
 }) {
-  const { username, className } = props;
+  const { username, className, userImage } = props;
 
   return (
     <div className={`flex items-center gap-4 ${className ?? ""}`}>
-      <div className="w-16 h-16 rounded-full bg-error" />
+      <img src = {userImage} className="w-16 h-16 rounded-full" />
       <p className="text-lg">
         {username}
       </p>
