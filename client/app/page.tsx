@@ -11,6 +11,7 @@ export default function Home() {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [userImage, setUserImage] = useState<string | null>(null);
   const [topArtists, setTopArtists] = useState<string[]>(["John Doe", "John Doe", "John Doe", "John Doe", "John Doe"]);
+  const [topGenre, setTopGenre] = useState<string | null>(null);
 
   // const [topArtistImages, setTopArtistImages] = useState<string[]>(["", "", "", "", ""]);
 
@@ -18,19 +19,26 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/spotify/get-data/${"me"}`, {
+        const userResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me"}`, {
           credentials: 'include', // Include credentials (cookies) in the request
         });
-        const data = await response.json();
-        setDisplayName(data.display_name);
-        setUserImage(data.images[0].url)
-        const response2 = await fetch(`http://localhost:8000/spotify/get-data/${"me|top|artists?limit=5"}`, {
+        const dataUser = await userResponse.json();
+        setDisplayName(dataUser.display_name);
+        setUserImage(dataUser.images[0].url)
+
+        const genreResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|top|genres"}`, {
           credentials: 'include', // Include credentials (cookies) in the request
         });
-        let dataArtists = await response2.json();
+        const dataGenre = await genreResponse.json();
+        setTopGenre(dataGenre.genres[0][0]);
+
+        const artistsResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|top|artists?limit=5"}`, {
+          credentials: 'include', // Include credentials (cookies) in the request
+        });
+        let dataArtists = await artistsResponse.json();
         dataArtists = dataArtists.items.map((item: any) => [item.name, item.images[0].url]);
         setTopArtists(dataArtists);
-        // setTopArtistImages(dataImages);
+
       } catch (error) {
         console.error('Error fetching user data:', error);
         console.log("Error occurred fetching")
@@ -65,7 +73,7 @@ export default function Home() {
             Top Genre:
           </p>
           <p className="text-2xl text-primary">
-            RnB
+            {topGenre || ""}
           </p>
         </div>
       </div>
