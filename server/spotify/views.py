@@ -15,7 +15,7 @@ from collections import Counter
 
 class AuthURL(APIView):
     def get(self, request, format=None):
-        scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing user-top-read' # can add more scopes when needed
+        scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing user-top-read user-read-recently-played' # can add more scopes when needed
 
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
             'scope': scopes,

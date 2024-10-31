@@ -12,9 +12,7 @@ export default function Home() {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [topArtists, setTopArtists] = useState<string[]>(["John Doe", "John Doe", "John Doe", "John Doe", "John Doe"]);
   const [topGenre, setTopGenre] = useState<string | null>(null);
-
-  // const [topArtistImages, setTopArtistImages] = useState<string[]>(["", "", "", "", ""]);
-
+  const [recentTrack, setRecentTrack] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +29,12 @@ export default function Home() {
         });
         const dataGenre = await genreResponse.json();
         setTopGenre(dataGenre.genres[0][0]);
+
+        const trackResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|player|recently-played?limit=1"}`, {
+          credentials: 'include', // Include credentials (cookies) in the request
+        });
+        const dataTrack = await trackResponse.json();
+        setRecentTrack(dataTrack.items[0].track.name + " by " + dataTrack.items[0].track.artists[0].name);
 
         const artistsResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|top|artists?limit=5"}`, {
           credentials: 'include', // Include credentials (cookies) in the request
@@ -64,10 +68,10 @@ export default function Home() {
 
         <div className="flex flex-col items-end whitespace-nowrap">
           <p className="text-lg">
-            Minutes listened:
+            Last played:
           </p>
           <p className="text-2xl text-primary mb-4">
-            100,000
+            {recentTrack || ""}
           </p>
           <p className="text-lg">
             Top Genre:
