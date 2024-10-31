@@ -38,11 +38,11 @@ def spotify_callback(request, format=None):
     refresh_token = response.get('refresh_token')
     expires_in = response.get('expires_in')
     error = response.get('error')
-    #print(expires_in)
+    
     print('Session key in callback is:', request.session.session_key)
     if not request.session.exists(request.session.session_key):
         request.session.create()
-
+    #print(expires_in)
     print('calling update/create with session key', request.session.session_key)
     update_or_create_user_tokens(request.session.session_key, access_token, token_type, expires_in, refresh_token)
 
