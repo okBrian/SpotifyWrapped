@@ -10,7 +10,7 @@ export default function Header(props: {
   const { dark, setDark } = props;
 
   return (
-    <div className="w-full h-16 flex justify-center items-center border-b-2">
+    <div className="w-full h-16 flex justify-center items-center border-b-2 dark:border-dark-border">
       <div className="w-full" />
       <p className="text-3xl whitespace-nowrap">
         Spotify Wrapped

@@ -15,7 +15,9 @@ export default function DarkModeProvider(props: {
         ? " dark bg-bg text-white border-dark-border"
         : " bg-white text-surface border-light-border")}>
       <Header dark={dark} setDark={setDark} />
-      {children}
+      <div className="w-[80rem] max-w-full p-4 pt-16">
+        {children}
+      </div>
     </div>
   )
 }

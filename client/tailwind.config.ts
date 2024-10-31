@@ -14,7 +14,7 @@ const config: Config = {
       colors: {
         "bg": "#121212",
         "surface": "#121212",
-        "dark-border": "#999999",
+        "dark-border": "#777777",
         "light-border": "#222222",
         "error": "#CF6679",
         "primary": "#BB86FC",
