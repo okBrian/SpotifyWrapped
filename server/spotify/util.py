@@ -33,6 +33,7 @@ def is_spotify_authenticated(session_id):
     if tokens:
         print('token exists in auth')
         expiry = tokens.expires_in
+        print(expiry, timezone.now())
         if expiry <= timezone.now():
             refresh_spotify_token(session_id)
         return True
@@ -41,6 +42,7 @@ def is_spotify_authenticated(session_id):
 
 def refresh_spotify_token(session_id):
     refresh_token = get_user_tokens(session_id).refresh_token
+    print("refreshing token")
     response = post('https://accounts.spotify.com/api/token', data={
         'grant_type': 'refresh_token',
         'refresh_token': refresh_token,
