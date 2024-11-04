@@ -53,7 +53,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-[40rem] max-w-full pt-16">
+    <>
       <div className="flex mb-8">
         <div className="flex flex-col grow">
           <UserBlock username={displayName || ""} className="grow mb-16" userImage={userImage || ""}/>
@@ -82,11 +82,11 @@ export default function Home() {
         </div>
       </div>
       
-      <div className="flex gap-2 overflow-x-scroll">
+      <div className="flex gap-4 overflow-x-scroll px-3 py-6">
         {[...Array(5)].map((_, i) =>
           <ArtistBlock key={i} num={i + 1} artist={topArtists[i][0] || ""} imageUrl={topArtists[i][1] || ""}/>
         )}
       </div>
-    </div>
+    </>
   )
 }
