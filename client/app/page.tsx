@@ -7,10 +7,15 @@ import { useEffect, useState } from 'react';
 
 
 export default function Home() {
-
-  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState<string | null>("John Doe");
   const [userImage, setUserImage] = useState<string | null>(null);
-  const [topArtists, setTopArtists] = useState<string[]>(["John Doe", "John Doe", "John Doe", "John Doe", "John Doe"]);
+  const [topArtists, setTopArtists] = useState<string[][]>([
+    ["John Doe", ""],
+    ["John Doe", ""],
+    ["John Doe", ""],
+    ["John Doe", ""],
+    ["John Doe", ""],
+  ]);
   const [topGenre, setTopGenre] = useState<string | null>(null);
   const [recentTrack, setRecentTrack] = useState<string | null>(null);
 

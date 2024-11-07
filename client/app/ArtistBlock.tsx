@@ -55,7 +55,11 @@ export default function ArtistBlock(props: {
           <p className="text-lg mb-4">
             {artist}
           </p>
-          <img src={imageUrl} className="w-full h-full object-cover rounded-lg" />
+          {imageUrl ? (
+            <img src={imageUrl} className="w-full h-full object-cover rounded-lg" />
+          ) : (
+            <div className="w-full h-full rounded-lg bg-error" />
+          )}
         </>}
       </div>
     </button>
