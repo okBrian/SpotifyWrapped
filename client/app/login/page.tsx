@@ -48,19 +48,19 @@ export default function Login() {
 
   // Check if the user is authenticated when the component mounts
   useEffect(() => {
-  const checkAuthentication = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/spotify/is-authenticated', {
-        credentials: 'include', // Include credentials (cookies) in the request
-      });
-      const data = await response.json();
-      setIsAuthenticated(data.status);
-    } catch (error) {
-      console.error('Error checking authentication:', error);
-    }
-  };
+    const checkAuthentication = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/spotify/is-authenticated', {
+          credentials: 'include', // Include credentials (cookies) in the request
+        });
+        const data = await response.json();
+        setIsAuthenticated(data.status);
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+      }
+    };
 
-  checkAuthentication();
+    checkAuthentication();
   }, []);
 
   return (
@@ -76,11 +76,21 @@ export default function Login() {
           Spotify Wrapped
         </p>
       </div>
-      <Button
-        className="bg-variant rounded-lg text-white z-10"
-      >
-        Login with Spotify
-      </Button>
+      {authUrl ? (
+        <a href={authUrl}>
+          <Button
+            className="bg-variant rounded-lg text-white z-10"
+          >
+            Login with Spotify
+          </Button>
+        </a>
+      ) : (
+        <Button
+          className="bg-variant rounded-lg text-white z-10"
+        >
+          Login with Spotify
+        </Button>
+      )}
 
       <p className="absolute bottom-0 right-0 text-faint-gray-light dark:text-faint-gray-dark text-[40rem] font-bold leading-none pb-48">
         24
