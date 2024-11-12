@@ -1,6 +1,9 @@
 "use client"; // This makes the component a Client Component
 
 import ArtistBlock from "./ArtistBlock";
+import Carousel from "./Carousel";
+import LastPlayed from "./LastPlayed";
+import Top5Artists from "./Top5Artists";
 import UserBlock from "./UserBlock";
 
 import { useEffect, useState } from 'react';
@@ -58,40 +61,13 @@ export default function Home() {
   }, []);
 
   return (
-    <>
-      <div className="flex mb-8">
-        <div className="flex flex-col grow">
-          <UserBlock username={displayName || ""} className="grow mb-16" userImage={userImage || ""}/>
-          <div className="flex flex-wrap gap-1 text-3xl">
-            <p>Your</p>
-            <p className="text-secondary">
-              Top 5
-            </p>
-            <p>Artists</p>
-          </div>
-        </div>
+    <div className="w-full">
+      <UserBlock username={displayName || ""} className="grow mb-16" userImage={userImage || ""}/>
 
-        <div className="flex flex-col items-end whitespace-nowrap">
-          <p className="text-lg">
-            Last played:
-          </p>
-          <p className="text-2xl text-primary mb-4">
-            {recentTrack || ""}
-          </p>
-          <p className="text-lg">
-            Top Genre:
-          </p>
-          <p className="text-2xl text-primary">
-            {topGenre || ""}
-          </p>
-        </div>
-      </div>
-      
-      <div className="flex gap-4 overflow-x-scroll px-3 py-6">
-        {[...Array(5)].map((_, i) =>
-          <ArtistBlock key={i} num={i + 1} artist={topArtists[i][0] || ""} imageUrl={topArtists[i][1] || ""}/>
-        )}
-      </div>
-    </>
+      <Carousel slides={[
+        <Top5Artists topArtists={topArtists} />,
+        <LastPlayed recentTrack={recentTrack ?? ""} topGenre={topGenre ?? ""} />
+      ]} />
+    </div>
   )
 }
