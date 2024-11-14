@@ -1,4 +1,6 @@
+import { useContext } from "react";
 import ArtistBlock from "./ArtistBlock";
+import { LangContext } from "./DarkModeProvider";
 
 
 export default function Top5Artists(props: {
@@ -6,14 +8,16 @@ export default function Top5Artists(props: {
 }) {
   const { topArtists } = props;
 
+  const lang = useContext(LangContext);
+
   return (
     <div className="max-w-full">
       <div className="flex flex-wrap gap-2 text-3xl">
-        <p>Your</p>
+        <p>{lang.your}</p>
         <p className="text-secondary">
-          Top 5
+          {lang.top5}
         </p>
-        <p>Artists</p>
+        <p>{lang.artists}</p>
       </div>
       
       <div className="flex gap-4 overflow-x-scroll px-3 py-6">
