@@ -1,9 +1,10 @@
 "use client"; // This makes the component a Client Component
 
-import ArtistBlock from "./ArtistBlock";
 import Carousel from "./Carousel";
 import LastPlayed from "./LastPlayed";
+import Top5Albums from "./Top5Albums";
 import Top5Artists from "./Top5Artists";
+import TopGenre from "./TopGenre";
 import UserBlock from "./UserBlock";
 
 import { useEffect, useState } from 'react';
@@ -18,6 +19,13 @@ export default function Home() {
     ["John Doe", ""],
     ["John Doe", ""],
     ["John Doe", ""],
+  ]);
+  const [topAlbums, setTopAlbums] = useState<string[][]>([
+    ["Album 1", ""],
+    ["Album 2", ""],
+    ["Album 3", ""],
+    ["Album 4", ""],
+    ["Album 5", ""],
   ]);
   const [topGenre, setTopGenre] = useState<string | null>(null);
   const [recentTrack, setRecentTrack] = useState<string | null>(null);
@@ -66,7 +74,9 @@ export default function Home() {
 
       <Carousel slides={[
         <Top5Artists topArtists={topArtists} />,
-        <LastPlayed recentTrack={recentTrack ?? ""} topGenre={topGenre ?? ""} />
+        <Top5Albums topAlbums={topAlbums} />,
+        <LastPlayed recentTrack={recentTrack ?? ""} />,
+        <TopGenre topGenre={topGenre ?? ""} />,
       ]} />
     </div>
   )

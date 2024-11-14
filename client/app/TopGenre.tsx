@@ -1,19 +1,19 @@
-export default function LastPlayed(props: {
-  recentTrack: string,
+export default function TopGenre(props: {
+  topGenre: string,
 }) {
-  const { recentTrack } = props;
+  const { topGenre } = props;
 
   return (
     <div className="max-w-full">
       <div className="flex flex-wrap gap-2 text-3xl">
         <p>Your</p>
         <p className="text-secondary">
-          Last Played
+          Top
         </p>
-        <p>Song</p>
+        <p>Genre</p>
       </div>
       <p className="text-2xl text-primary mt-12">
-        {recentTrack || "Song"}
+        {topGenre || "Genre"}
       </p>
     </div>
   )
