@@ -1,7 +1,10 @@
-import { Language, LANGUAGES } from "@/util/types";
+import { Language } from "@/util/types";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Switch } from "@nextui-org/react";
 import { LuSun, LuMoon } from "react-icons/lu";
 import { GrGlobe } from "react-icons/gr";
+import { LANGUAGES } from "@/util/languages";
+import { useContext } from "react";
+import { LangContext } from "./DarkModeProvider";
 
 
 export default function Header(props: {
@@ -11,6 +14,8 @@ export default function Header(props: {
   setLanguage: (value: Language) => void,
 }) {
   const { dark, setDark, language, setLanguage } = props;
+
+  const lang = useContext(LangContext);
 
   return (
     <div className="w-full h-16 flex justify-center items-center border-b-2 border-light-border dark:border-dark-border">
@@ -36,9 +41,9 @@ export default function Header(props: {
             onAction={key => setLanguage(key as Language)}
             className={`${dark ? "bg-bg text-white" : "bg-white text-surface"} drop-shadow-lg rounded-lg border-2 border-light-border dark:border-dark-border`}
           >
-            {LANGUAGES.map(lang =>
-              <DropdownItem key={lang}>
-                {lang}
+            {Object.keys(LANGUAGES).map(l =>
+              <DropdownItem key={l}>
+                {l}
               </DropdownItem>
             )}
           </DropdownMenu>
@@ -58,7 +63,7 @@ export default function Header(props: {
             wrapper: `border-2 transition duration-300 border-light-border dark:border-dark-border ${dark ? "" : "bg-slate-300"}`,
           }}
         >
-          Dark mode
+          {lang.darkMode}
         </Switch>
       </div>
     </div>
