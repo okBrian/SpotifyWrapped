@@ -1,16 +1,20 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { LangContext } from "./DarkModeProvider";
 
 
 export default function ArtistBlock(props: {
-  num: number,
-  artist: String,
+    num: number,
+    artist: string,
+    imageUrl: string,
 }) {
-  const { num, artist } = props;
+  const { num, artist, imageUrl} = props;
 
   const [flipped, setFlipped] = useState(false);
   const [showBack, setShowBack] = useState(false);
+
+  const lang = useContext(LangContext);
 
   useEffect(() => {
     if (flipped) {
@@ -36,7 +40,7 @@ export default function ArtistBlock(props: {
             {artist}
           </h3>
           <p>
-            Minutes listened:
+            {lang.minutesListened}:
           </p>
           <p className="text-2xl text-primary mb-4">
             20,000
@@ -54,7 +58,11 @@ export default function ArtistBlock(props: {
           <p className="text-lg mb-4">
             {artist}
           </p>
-          <div className="w-full h-full bg-error rounded-lg" />
+          {imageUrl ? (
+            <img src={imageUrl} className="w-full h-full object-cover rounded-lg" />
+          ) : (
+            <div className="w-full h-full rounded-lg bg-error" />
+          )}
         </>}
       </div>
     </button>

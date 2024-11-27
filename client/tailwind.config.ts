@@ -15,7 +15,7 @@ const config: Config = {
         "bg": "#121212",
         "surface": "#121212",
         "dark-border": "#777777",
-        "light-border": "#222222",
+        "light-border": "#777777",
         "error": "#CF6679",
         "primary": "#BB86FC",
         "variant": "#3700B3",
