@@ -3,8 +3,10 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     display_name = models.CharField(max_length=255)
+    user_id = models.CharField(max_length=50, unique=True)
     url = models.URLField(max_length=500)
     profile_picture = models.OneToOneField('Picture', on_delete=models.CASCADE, null=True)
+    artists = models.ManyToManyField(Artist, relate_name='top_artists_for', blank=True)
 
 class Artist(models.Model):
     name = models.CharField(max_length=255)
