@@ -94,7 +94,23 @@ class DataView(APIView):
                     return Response(top_genres, status=status.HTTP_200_OK)
                 except:
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+            elif query == "me/genre_diversity":
+                #calculating genre diversity
+                try:
+                    data = get('https://api.spotify.com/v1/me/top/artists', headers=headers).json()
+                    print("data fetch successful")
+                    data = data['items']
+                    genres = []
+                    for artist in data:
+                        for artist_genre in artist['genres']:
+                            genres.append(artist_genre)
+                    counter = Counter(genres)
+                    genre_diversity = len(genres)/len(counter)
+                    return Response(genre_diversity, status=status.HTTP_200_OK)
+                except:
+                    return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
             elif query == "me/top/features":
+            # Deprecated feature - audio features endpoint was closed by Spotify
                 data = get('https://api.spotify.com/v1/me/top/tracks', headers=headers).json()
                 print("data fetch successful")
                 tracks = data['items']
@@ -117,6 +133,7 @@ class DataView(APIView):
 
                 return Response({'acousticness': acousticness, 'danceability': danceability, 'energy': energy}, status=status.HTTP_200_OK)
             elif query == "me/diversity":
+            # Deprecated feature - audio features endpoint was closed by Spotify
                 data = get('https://api.spotify.com/v1/me/top/tracks', headers=headers).json()
                 print("data fetch successful")
                 tracks = data['items']
@@ -133,29 +150,43 @@ class DataView(APIView):
 
                 return Response({'diversity': diversity}, status=status.HTTP_200_OK)
             elif query == "me/description":
-
+            # getting LLM description
+                #get genre data
                 data = get('https://api.spotify.com/v1/me/top/artists', headers=headers).json()
                 data = data['items']
                 genres = []
                 for artist in data:
                     for artist_genre in artist['genres']:
                         genres.append(artist_genre)
+                #send request to LLM
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={LLM_TOKEN}"
+                # Define the headers and payload
+                headers = {
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "contents": [
+                        {
+                            "parts": [
+                                {
+                                    "text": f"In 1-2 sentences describe how someone who listens to the following genres might behave. Don't talk about their music taste, but exclusively their personality and behavior: {genres}"
+                                }
+                            ]
+                        }
+                    ]
+                }
 
-                API_URL = "https://api-inference.huggingface.co/models/google/gemma-2-2b-it"
-                headers = {"Authorization": f"Bearer {LLM_TOKEN}"}
-                def query (payload):
-                    response = post(API_URL, headers=headers, json=payload)
-                    return response.json()
-                genre_input = f"Describe the behavior of someone who listens to the following genres{genres}"
-                output = query({"inputs": genre_input, "parameters": {"return_full_text": False}})
+                # Make the POST request
+                response = post(url, headers=headers, json=payload, params={"key": LLM_TOKEN}).json()
 
                 try:
-                    print(output[0]['generated_text'].strip())
+                    response_text = response['candidates'][0]['content']['parts'][0]['text']
+                    print(response_text)
                     print("llm data fetch successful")
-                    return Response(output, status=status.HTTP_200_OK)
+                    return Response(response_text, status=status.HTTP_200_OK)
                 except:
                     print("llm data fetch failed")
-                    print(output)
+                    print(response)
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 try:
