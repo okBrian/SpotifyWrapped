@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { LangContext } from "./DarkModeProvider";
 
 
 export default function ArtistBlock(props: {
@@ -12,6 +13,8 @@ export default function ArtistBlock(props: {
 
   const [flipped, setFlipped] = useState(false);
   const [showBack, setShowBack] = useState(false);
+
+  const lang = useContext(LangContext);
 
   useEffect(() => {
     if (flipped) {
@@ -37,7 +40,7 @@ export default function ArtistBlock(props: {
             {artist}
           </h3>
           <p>
-            Minutes listened:
+            {lang.minutesListened}:
           </p>
           <p className="text-2xl text-primary mb-4">
             20,000
