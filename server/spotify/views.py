@@ -8,10 +8,10 @@ from rest_framework.views import APIView
 from requests import Request, post, get
 from rest_framework import status
 from rest_framework.response import Response
-from .util import update_or_create_user_tokens, is_spotify_authenticated, get_user_tokens
+from .util import update_or_create_user_tokens, is_spotify_authenticated, get_user_tokens, save_artists_to_profile
 from django.http import HttpResponseRedirect
 from collections import Counter
-from members.models import Genre, UserGenre, Profile  # Import models
+from members.models import Genre, UserGenre, Profile 
 from django.contrib.auth.models import User
 from django.contrib.auth import login # added so django auth works
 
@@ -62,12 +62,12 @@ def spotify_callback(request, format=None):
     }
     user_data = get('https://api.spotify.com/v1/me', headers=headers).json()
 
-    # Extract user info from Spotify response
+    # get user info from Spotify response
     spotify_user_id = user_data['id']
     display_name = user_data.get('display_name', '')
     profile_url = user_data.get('external_urls', {}).get('spotify', '')
 
-    # Check if the user already exists in Django, if not, create a new user
+    # check if the user already exists in django. if not, create a new user
     user, created = User.objects.get_or_create(username=spotify_user_id, defaults={
         'first_name': display_name, 
     })
@@ -75,7 +75,6 @@ def spotify_callback(request, format=None):
     # Log the user in to the Django app
     login(request, user)
 
-    # Create or update the user's profile
     profile, created = Profile.objects.get_or_create(
         user=user,
         defaults={
@@ -162,6 +161,29 @@ class DataView(APIView):
                 try:
                     data = get(('https://api.spotify.com/v1/' + query), headers=headers).json()
                     print(query + "data fetch successful in else statement")
+                    if (query == "me/top/artists"):
+                        """
+                        print(data)
+                        top_artists = json.loads(data)
+                        top_artists = [artist["name"] for artist in top_artists]
+                        print(top_artists)
+                        """
+                        artists = data.get("items", [])
+                        parsed_data = []
+
+                        for artist in artists:
+                            artist_info = {
+                                "name": artist.get("name"),
+                                #"genres": ", ".join(artist.get("genres", [])),
+                                #"followers": artist.get("followers", {}).get("total", 0),
+                                "popularity": artist.get("popularity"),
+                                "spotify_link": artist.get("external_urls", {}).get("spotify"),
+                            }
+                            parsed_data.append(artist_info)
+                        # to print just the name, genres, followers, etc.. do below
+                        #print(parsed_data[0]["name"])
+
+                        save_artists_to_profile(request.user, parsed_data)
                     
                     return Response(data, status=status.HTTP_200_OK)
                 except:
