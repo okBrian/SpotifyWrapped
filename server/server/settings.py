@@ -62,6 +62,8 @@ CORS_ALLOWED_ORIGINS = [
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 CORS_ALLOW_CREDENTIALS = True 
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
 
 TEMPLATES = [
     {

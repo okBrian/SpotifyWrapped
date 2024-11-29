@@ -7,14 +7,15 @@ from rest_framework.views import APIView
 from requests import Request, post, get
 from rest_framework import status
 from rest_framework.response import Response
-from .util import update_or_create_user_tokens, is_spotify_authenticated, get_user_tokens
 from django.http import HttpResponseRedirect
 from members.models import Profile, Artist, Genre, UserGenre
+from django.shortcuts import get_object_or_404
+
 import random
 
 # import database from spotify/models.py
 #from spotify.models import User
-from members.models import User, Artist, Albums, Picture
+from members.models import User, Artist, Album, Picture
 
 # Create your views here.
 
@@ -37,7 +38,7 @@ class TopArtistGuessingGame(APIView):
         request.session['top_artist_guess'] = top_artist.name
         return Response({'message' : 'Guess the top artist'}, status=status.HTTP_200_OK)
 
-    def post(self, request, format=None):
+    #def post(self, request, format=None):
         # Call this when a user submits a guess
         # TODO: make a serialzer
 
@@ -45,7 +46,7 @@ class HigherOrLowerGame(APIView):
     def get(self, request):
         # get user profile... might have to change to spotify ID if needed
         user_profile = get_object_or_404(Profile, user=request.user)
-        user_artists = user_profile.artists.all()
+        user_artists = list(user_profile.artists.all())
 
         if len(user_artists) < 2:
             return Response({
