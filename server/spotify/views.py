@@ -124,10 +124,7 @@ class DataView(APIView):
                     counter = Counter(genres)
                     top_genres = counter.most_common(5)
                     top_genres = {"genres": top_genres}
-                    print(counter)
-                    print(top_genres)
                     user = request.user
-                    print(user)
                     profile, created = Profile.objects.get_or_create(
                         user=user,
                         defaults={
@@ -143,8 +140,7 @@ class DataView(APIView):
                     #with transaction.atomic():
                     #print(top_genres['genres'])
                     for genre_name, count in top_genres['genres']:
-                        print(genre_name)
-                        print(count)
+
                         genre, _ = Genre.objects.get_or_create(name=genre_name)
                         UserGenre.objects.update_or_create(
                             user=profile,
