@@ -151,8 +151,29 @@ class DataView(APIView):
                     return Response(top_genres, status=status.HTTP_200_OK)
                 except:
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+
+            elif query == "me/top/albums":
+                # Getting top albums from top tracks
+                try:
+                    data = get('https://api.spotify.com/v1/me/top/tracks?limit=50', headers=headers).json()
+                    print("data fetch successful")
+                    tracks = data['items']
+                    albums = [track['album']['id'] for track in tracks]
+                    counter = Counter(albums)
+                    top_albums = counter.most_common(5)
+                    top_albums = [[album[0] for album in top_albums]]
+
+                    data = get(f'https://api.spotify.com/v1/albums', headers=headers, params = {"ids": ",".join(top_albums[0])}).json()
+                    data = data["albums"]
+                    albums_info = [(album["name"], album["images"][0]["url"]) for album in data]
+
+                    return Response(albums_info, status=status.HTTP_200_OK)
+                except Exception as e:
+                    print(e)
+                    return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+
             elif query == "me/genre_diversity":
-                #calculating genre diversity
+                # Calculating genre diversity
                 try:
                     data = get('https://api.spotify.com/v1/me/top/artists', headers=headers).json()
                     print("data fetch successful")
@@ -189,6 +210,7 @@ class DataView(APIView):
                 energy = energy / 20
 
                 return Response({'acousticness': acousticness, 'danceability': danceability, 'energy': energy}, status=status.HTTP_200_OK)
+
             elif query == "me/diversity":
             # Deprecated feature - audio features endpoint was closed by Spotify
                 data = get('https://api.spotify.com/v1/me/top/tracks', headers=headers).json()
@@ -206,8 +228,9 @@ class DataView(APIView):
                 diversity = diversity / 20
 
                 return Response({'diversity': diversity}, status=status.HTTP_200_OK)
+
             elif query == "me/description":
-            # getting LLM description
+            # Getting LLM description
                 #get genre data
                 data = get('https://api.spotify.com/v1/me/top/artists', headers=headers).json()
                 data = data['items']
@@ -215,7 +238,8 @@ class DataView(APIView):
                 for artist in data:
                     for artist_genre in artist['genres']:
                         genres.append(artist_genre)
-                #send request to LLM
+
+                # Send request to LLM
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={LLM_TOKEN}"
                 # Define the headers and payload
                 headers = {
@@ -235,7 +259,6 @@ class DataView(APIView):
 
                 # Make the POST request
                 response = post(url, headers=headers, json=payload, params={"key": LLM_TOKEN}).json()
-
                 try:
                     response_text = response['candidates'][0]['content']['parts'][0]['text']
                     print(response_text)
@@ -245,7 +268,9 @@ class DataView(APIView):
                     print("llm data fetch failed")
                     print(response)
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+
             else:
+            # Direct requests that don't require additional data processing
                 try:
                     data = get(('https://api.spotify.com/v1/' + query), headers=headers).json()
                     print(query + " data fetch successful")
