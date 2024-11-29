@@ -126,10 +126,8 @@ class DataView(APIView):
                     top_genres = {"genres": top_genres}
                     print(counter)
                     print(top_genres)
-                    print("Getting user")
                     user = request.user
                     print(user)
-                    print("Getting profile")
                     profile, created = Profile.objects.get_or_create(
                         user=user,
                         defaults={
@@ -139,11 +137,11 @@ class DataView(APIView):
 
                     )
                     #print("profile is " + profile)
-                    print("Got profile")
+                    #print("Got profile")
 
                     # Save genres in the database
                     #with transaction.atomic():
-                    print(top_genres['genres'])
+                    #print(top_genres['genres'])
                     for genre_name, count in top_genres['genres']:
                         print(genre_name)
                         print(count)
@@ -160,31 +158,21 @@ class DataView(APIView):
             else:
                 try:
                     data = get(('https://api.spotify.com/v1/' + query), headers=headers).json()
-                    print(query + "data fetch successful in else statement")
+                    print(query + " data fetch successful")
                     if (query == "me/top/artists"):
-                        """
-                        print(data)
-                        top_artists = json.loads(data)
-                        top_artists = [artist["name"] for artist in top_artists]
-                        print(top_artists)
-                        """
                         artists = data.get("items", [])
                         parsed_data = []
 
                         for artist in artists:
                             artist_info = {
                                 "name": artist.get("name"),
-                                #"genres": ", ".join(artist.get("genres", [])),
-                                #"followers": artist.get("followers", {}).get("total", 0),
                                 "popularity": artist.get("popularity"),
                                 "spotify_link": artist.get("external_urls", {}).get("spotify"),
                             }
                             parsed_data.append(artist_info)
-                        # to print just the name, genres, followers, etc.. do below
-                        #print(parsed_data[0]["name"])
 
                         save_artists_to_profile(request.user, parsed_data)
-                    
+
                     return Response(data, status=status.HTTP_200_OK)
                 except:
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)

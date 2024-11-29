@@ -66,12 +66,11 @@ def save_artists_to_profile(user, artist_list):
     user: The `User` instance whose profile will be updated.
     artist_list: A list of dictionaries with artist info ([{'name': 'Artist name', 'url': '...'}, ...]).
     """
-    print("Saving artists to profile")
     profile = user.profile  
     
     for artist_data in artist_list:
         # get or create the artist model
-        print(artist_data)
+        #print(artist_data)
         artist, created = Artist.objects.get_or_create(
             name=artist_data['name'],
             defaults={
@@ -79,7 +78,6 @@ def save_artists_to_profile(user, artist_list):
                 'url': artist_data['spotify_link']
             }
         )
-        print("finished get or create")
         # if artist image is needed then I can change below
         """ 
         if 'images' in artist_data and artist_data['images']:
