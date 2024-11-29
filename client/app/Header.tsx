@@ -3,7 +3,9 @@ import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Switch }
 import { LuSun, LuMoon } from "react-icons/lu";
 import { GrGlobe } from "react-icons/gr";
 import { LANGUAGES } from "@/util/languages";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
+import { toast } from 'react-toastify';
+import { useRouter } from "next/navigation";
 import { LangContext } from "./DarkModeProvider";
 
 
@@ -12,10 +14,42 @@ export default function Header(props: {
   setDark: (value: boolean) => void,
   language: Language,
   setLanguage: (value: Language) => void,
+  loggedIn: boolean,
+  setLoggedIn: (value: boolean) => void,
+  loading: boolean,
+  setLoading: (value: boolean) => void,
 }) {
-  const { dark, setDark, language, setLanguage } = props;
+  const { dark, setDark, language, setLanguage, loggedIn, setLoggedIn, loading, setLoading } = props;
 
   const lang = useContext(LangContext);
+  const router = useRouter();
+
+  useEffect(() => {
+    const ls = localStorage.getItem('loggedIn');
+
+    if (ls && JSON.parse(ls)) {
+      setLoggedIn(true);
+    }
+  }, []);
+
+  const logOut = async () => {
+    setLoading(true);
+    const res = await fetch("http://localhost:8000/logout/", {
+      method: "POST",
+      headers: {
+        "Authorization": `Token ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    setLoading(false);
+    if (res.status === 200) {
+      localStorage.setItem("loggedIn", JSON.stringify(false));
+      setLoggedIn(false);
+      router.push("/");
+      toast.success("Logged Out!");
+    }
+  }
 
   return (
     <div className="w-full h-16 flex justify-center items-center border-b-2 border-light-border dark:border-dark-border">
@@ -65,6 +99,17 @@ export default function Header(props: {
         >
           {lang.darkMode}
         </Switch>
+
+        <Button
+          color="warning"
+          size="lg"
+          isLoading={loading}
+          onClick={() => { logOut() }}
+        >
+          <p className="font-bold">
+            Log out
+          </p>
+        </Button>
       </div>
     </div>
   )

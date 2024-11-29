@@ -1,100 +1,102 @@
-"use client"; // This makes the component a Client Component
-
-import { Button } from '@nextui-org/react';
-import { useEffect, useState } from 'react';
+"use client"
+import { Button, Input, Link } from "@nextui-org/react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from 'react-toastify';
+import { EyeSlashFilledIcon } from "../register/EyeSlashFilledIcon";
+import { EyeFilledIcon } from "../register/EyeFilledIcon";
 
 
 export default function Login() {
-  const [authUrl, setAuthUrl] = useState<string | null>(null);
-  const [displayName, setDisplayName] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const router = useRouter();
 
+  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  // Fetch the authentication URL when the component mounts
-  useEffect(() => {
-    const fetchAuthUrl = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/spotify/get-auth-url');
-        const data = await response.json();
-        setAuthUrl(data.url);
-        console.log('Auth URL fetched:', data.url);
-      } catch (error) {
-        console.error('Error fetching auth URL:', error);
-        console.log("Error happened fetching")
-      }
-    };
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
-    fetchAuthUrl();
-  }, []);
-    
-  useEffect(() => {
-    const fetchData = async () => {
-      const query = "me"
-      try {
-        const response = await fetch(`http://localhost:8000/spotify/get-data/${query}`, {
-          credentials: 'include', // Include credentials (cookies) in the request
-        });
-        const data = await response.json();
-        setDisplayName(data.display_name);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        console.log("Error occurred fetching")
-      }
-    };
-
-    fetchData();
-  }, []);
-
-
-  // Check if the user is authenticated when the component mounts
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/spotify/is-authenticated', {
-          credentials: 'include', // Include credentials (cookies) in the request
-        });
-        const data = await response.json();
-        setIsAuthenticated(data.status);
-      } catch (error) {
-        console.error('Error checking authentication:', error);
-      }
-    };
-
-    checkAuthentication();
-  }, []);
+  const onSubmit = async () => {
+    setLoading(true);
+    const res = await fetch("http://localhost:8000/login/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    });
+    setLoading(false);
+    if (res.status === 200) {
+      localStorage.setItem("loggedIn", JSON.stringify(true));
+      const { token } = await res.json();
+      localStorage.setItem("token", token); // Save the token in local storage
+      router.push("/");
+    } else if (res.status === 401) {
+      toast.error("Username or Password Incorrect")
+    }
+  }
 
   return (
-    <div className="w-full h-full relative overflow-hidden pt-32">
-      <div className="flex flex-wrap gap-2 text-5xl w-min whitespace-nowrap mb-12">
-        <p className="z-10">
-          Your
+    <div className="flex w-full h-full justify-center items-center">
+      <div className="w-96 bg-white drop-shadow-lg dark:bg-slate-600 p-6 flex flex-col gap-6 items-center rounded-xl">
+        <p className="text-xl font-bold">
+          Login
         </p>
-        <p className="text-secondary z-10">
-          2024
-        </p>
-        <p className="z-10">
-          Spotify Wrapped
-        </p>
-      </div>
-      {authUrl ? (
-        <a href={authUrl}>
-          <Button
-            className="bg-variant rounded-lg text-white z-10"
+        <Input
+          type="username"
+          label="Username"
+          placeholder="Enter your username"
+          isRequired
+          value={username}
+          onValueChange={setUsername}
+          classNames={{
+            "label": "font-bold uppercase",
+            "base": "drop-shadow-md",
+          }}
+        />
+        <Input
+          label="Password"
+          placeholder="Enter your password"
+          isRequired
+          value={password}
+          onValueChange={setPassword}
+          classNames={{
+            "label": "font-bold uppercase",
+            "base": "drop-shadow-md",
+          }}
+          endContent={
+            <button className="focus:outline-none" type="button" onClick={toggleVisibility} aria-label="toggle password visibility">
+              {isVisible ? (
+                <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+              ) : (
+                <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+              )}
+            </button>
+          }
+          type={isVisible ? "text" : "password"}
+        />
+        <div className="flex w-full h-full justify-end items-center gap-6">
+          <Link
+            href="/register"
+            underline="hover"
           >
-            Login with Spotify
+            <p className="italic hover:cursor-pointer">
+              Create an account
+            </p>
+          </Link>
+          <Button
+            color="primary"
+            isLoading={loading}
+            onPress={onSubmit}
+          >
+            Login
           </Button>
-        </a>
-      ) : (
-        <Button
-          className="bg-variant rounded-lg text-white z-10"
-        >
-          Login with Spotify
-        </Button>
-      )}
-
-      <p className="absolute bottom-0 right-0 text-faint-gray-light dark:text-faint-gray-dark text-[40rem] font-bold leading-none pb-48">
-        24
-      </p>
+        </div>
+      </div>
     </div>
   )
 }
