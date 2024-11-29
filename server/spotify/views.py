@@ -3,7 +3,7 @@ from statistics import quantiles
 from urllib.error import HTTPError
 
 from django.shortcuts import render, redirect
-from .credentials import REDIRECT_URI, CLIENT_SECRET, CLIENT_ID
+from .credentials import REDIRECT_URI, CLIENT_SECRET, CLIENT_ID, LLM_TOKEN
 from rest_framework.views import APIView
 from requests import Request, post, get
 from rest_framework import status
@@ -150,6 +150,100 @@ class DataView(APIView):
 
                     return Response(top_genres, status=status.HTTP_200_OK)
                 except:
+                    return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+            elif query == "me/genre_diversity":
+                #calculating genre diversity
+                try:
+                    data = get('https://api.spotify.com/v1/me/top/artists', headers=headers).json()
+                    print("data fetch successful")
+                    data = data['items']
+                    genres = []
+                    for artist in data:
+                        for artist_genre in artist['genres']:
+                            genres.append(artist_genre)
+                    counter = Counter(genres)
+                    genre_diversity = len(genres)/len(counter)
+                    return Response(genre_diversity, status=status.HTTP_200_OK)
+                except:
+                    return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+            elif query == "me/top/features":
+            # Deprecated feature - audio features endpoint was closed by Spotify
+                data = get('https://api.spotify.com/v1/me/top/tracks', headers=headers).json()
+                print("data fetch successful")
+                tracks = data['items']
+                tracks = [track['id'] for track in tracks]
+
+                #Tracking features
+                acousticness = 0
+                danceability = 0
+                energy = 0
+
+                for track in tracks:
+                    features = get('https://api.spotify.com/v1/audio-features/' + track, headers=headers).json()
+                    acousticness += features['acousticness']
+                    danceability += features['danceability']
+                    energy += features['energy']
+
+                acousticness = acousticness / 20
+                danceability = danceability / 20
+                energy = energy / 20
+
+                return Response({'acousticness': acousticness, 'danceability': danceability, 'energy': energy}, status=status.HTTP_200_OK)
+            elif query == "me/diversity":
+            # Deprecated feature - audio features endpoint was closed by Spotify
+                data = get('https://api.spotify.com/v1/me/top/tracks', headers=headers).json()
+                print("data fetch successful")
+                tracks = data['items']
+                tracks = [track['id'] for track in tracks]
+
+                #Tracking diversity
+                diversity = 0
+
+                for track in tracks:
+                    features = get('https://api.spotify.com/v1/audio-features/' + track, headers=headers).json()
+                    diversity += features['instrumentalness']
+
+                diversity = diversity / 20
+
+                return Response({'diversity': diversity}, status=status.HTTP_200_OK)
+            elif query == "me/description":
+            # getting LLM description
+                #get genre data
+                data = get('https://api.spotify.com/v1/me/top/artists', headers=headers).json()
+                data = data['items']
+                genres = []
+                for artist in data:
+                    for artist_genre in artist['genres']:
+                        genres.append(artist_genre)
+                #send request to LLM
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={LLM_TOKEN}"
+                # Define the headers and payload
+                headers = {
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "contents": [
+                        {
+                            "parts": [
+                                {
+                                    "text": f"In 1-2 sentences describe how someone who listens to the following genres might behave. Don't talk about their music taste, but exclusively their personality and behavior: {genres}"
+                                }
+                            ]
+                        }
+                    ]
+                }
+
+                # Make the POST request
+                response = post(url, headers=headers, json=payload, params={"key": LLM_TOKEN}).json()
+
+                try:
+                    response_text = response['candidates'][0]['content']['parts'][0]['text']
+                    print(response_text)
+                    print("llm data fetch successful")
+                    return Response(response_text, status=status.HTTP_200_OK)
+                except:
+                    print("llm data fetch failed")
+                    print(response)
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 try:

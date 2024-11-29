@@ -59,6 +59,10 @@ export default function Home() {
         dataArtists = dataArtists.items.map((item: any) => [item.name, item.images[0].url]);
         setTopArtists(dataArtists);
 
+        const llm = await fetch(`http://localhost:8000/spotify/get-data/${"me|description"}`, {
+          credentials: 'include', // Include credentials (cookies) in the request
+        });
+
       } catch (error) {
         console.error('Error fetching user data:', error);
         console.log("Error occurred fetching")
