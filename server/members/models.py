@@ -21,6 +21,7 @@ class Artist(models.Model):
     url = models.URLField(max_length=500)
     images = models.ManyToManyField('Picture', blank=True)
     popularity = models.IntegerField(default=0)
+    user_fav_track = models.CharField(max_length=255, blank=True, null=True)
 
 class Album(models.Model):
     name = models.CharField(max_length=255)

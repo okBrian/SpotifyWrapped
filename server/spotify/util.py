@@ -75,7 +75,8 @@ def save_artists_to_profile(user, artist_list):
             name=artist_data['name'],
             defaults={
                 'popularity': artist_data['popularity'],
-                'url': artist_data['spotify_link']
+                'url': artist_data['spotify_link'],
+                'user_fav_track': artist_data['user_fav_track']
             }
         )
         # if artist image is needed then I can change below

@@ -22,7 +22,7 @@ export default function Top5Albums(props: {
       
       <div className="flex gap-4 overflow-x-scroll px-3 py-6">
         {[...Array(5)].map((_, i) =>
-          <ArtistBlock key={i} num={i + 1} artist={topAlbums[i][0] || ""} imageUrl={topAlbums[i][1] || ""}/>
+          <ArtistBlock key={i} num={i + 1} artist={topAlbums[i][0] || ""} imageUrl={topAlbums[i][1] || ""} fav_track={topAlbums[i][2] || "err"}/>
         )}
       </div>
     </div>
