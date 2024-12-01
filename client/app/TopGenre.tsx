@@ -1,9 +1,10 @@
 import { useContext } from "react";
 import { LangContext } from "./DarkModeProvider";
+import { Genre } from "@/util/types";
 
 
 export default function TopGenre(props: {
-  topGenres: string[][],
+  topGenres: Genre[],
   genreDiversity: number | null,
 }) {
   const { topGenres, genreDiversity } = props;
@@ -20,12 +21,10 @@ export default function TopGenre(props: {
         <p>Genres:</p>
       </div>
       <p className="text-2xl text-primary mt-8">
-        {topGenres.map(g => {
-          if (g[0] === "") {
-            return "Genre";
-          }
-          return g;
-        }).join(", ")}
+        {topGenres.map(g => g.name.toLowerCase()
+          .split(' ')
+          .map((s: string) => s.charAt(0).toUpperCase() + s.substring(1))
+          .join(' ')).join(", ")}
       </p>
       <p className="text-3xl text-secondary mt-12">
         Diversity Score: {genreDiversity}
