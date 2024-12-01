@@ -8,7 +8,6 @@ from django.shortcuts import get_object_or_404
 
 class HigherOrLowerGame(APIView):
     def get(self, request):
-        # Get user profile
         user_profile = get_object_or_404(Profile, user=request.user)
         user_artists = list(user_profile.artists.all())
 
@@ -17,7 +16,7 @@ class HigherOrLowerGame(APIView):
                 "message": "Not enough artists to play the game."
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Get two random artists
+        # two random artists from users top artists
         artist1, artist2 = sample(user_artists, 2)
 
         # Randomly decide which artist will be the question
@@ -28,7 +27,6 @@ class HigherOrLowerGame(APIView):
             question_artist = artist2
             other_artist = artist1
 
-        # Prepare question data
         question_data = {
             'question': f"Does {question_artist.name} have more followers than {other_artist.name}?",
             'artist_name': question_artist.name,
@@ -37,16 +35,16 @@ class HigherOrLowerGame(APIView):
             'other_artist_followers': other_artist.popularity
         }
 
-        # Initialize the game score if it doesn't exist
+        # make the game score if it doesn't exist
         if not hasattr(user_profile, 'game_score'):
             user_profile.game_score = 0
             user_profile.save()
-
+        """
         print(question_artist.popularity)
         print(other_artist.popularity)
         print(question_artist.name)
         print(other_artist.name)
-        # Return the question and the current score
+        """
         return Response({
             'question': question_data['question'],
             'game_score': user_profile.game_score,
@@ -59,7 +57,6 @@ class HigherOrLowerGame(APIView):
     def post(self, request):
         user_profile = get_object_or_404(Profile, user=request.user)
         """
-        # If score is 0, the game is already over
         if user_profile.game_score == 0:
             return Response({
                 'message': 'Game Over! Your score is: 0',
@@ -67,18 +64,16 @@ class HigherOrLowerGame(APIView):
                 'game_over': True  # Explicitly flag game-over state
             }, status=status.HTTP_200_OK)
         """
-        # Get data from the request
         answer = request.data.get('answer')
         artist_followers = request.data.get('artist_followers')
         other_artist_followers = request.data.get('other_artist_followers')
-        print("In POST: " + str(artist_followers))
-        # Validate that both artist followers are provided
+        #print("In POST: " + str(artist_followers))
+
         if artist_followers is None or other_artist_followers is None:
             return Response({
                 'message': 'Invalid data: artist followers count is missing.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Ensure both values are integers
         try:
             artist_followers = int(artist_followers)
             other_artist_followers = int(other_artist_followers)
@@ -87,17 +82,15 @@ class HigherOrLowerGame(APIView):
                 'message': 'Invalid data: followers count must be a valid integer.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Determine the correct answer
-        correct_answer = 'higher' if artist_followers > other_artist_followers else 'lower'
+        correct_answer = 'higher' if artist_followers > other_artist_followers else 'lower' # can change if we decide to add more questions later
 
         if answer == correct_answer:
-            # Correct answer: increase score and return next question
+            # increase score and return next question
             user_profile.game_score += 1
             user_profile.save()
 
-            # Get the next question with two new random artists
             artist1 = choice(Artist.objects.all())
-            artist2 = choice(Artist.objects.exclude(id=artist1.id))  # ensure it's a different artist
+            artist2 = choice(Artist.objects.exclude(id=artist1.id)) 
 
             question_artist, other_artist = (artist1, artist2) if choice([True, False]) else (artist2, artist1)
 
@@ -116,11 +109,11 @@ class HigherOrLowerGame(APIView):
                 'other_artist_name': other_artist.name,
                 'artist_followers': question_artist.popularity,
                 'other_artist_followers': other_artist.popularity,
-                'game_over': False  # Explicitly flag ongoing game
+                'game_over': False  #  ongoing game
             }, status=status.HTTP_200_OK)
 
         else:
-            # Incorrect answer: reset score and end game
+            #   reset score and end game
             last_attempt = user_profile.game_score
             user_profile.game_score = 0
             user_profile.save()
@@ -128,5 +121,5 @@ class HigherOrLowerGame(APIView):
             return Response({
                 'message': f"Game Over! Your score is: {last_attempt}",
                 'game_score': last_attempt,
-                'game_over': True  # Explicitly flag game-over state
+                'game_over': True  # game over state
             }, status=status.HTTP_200_OK)

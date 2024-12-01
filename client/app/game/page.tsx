@@ -1,9 +1,8 @@
-"use client"; // This makes the component a Client Component
+"use client";
 
 import { Button } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 
-// Helper function to get CSRF token from cookies
 const getCsrfToken = () => {
     const match = document.cookie.match(/csrftoken=([^;]+)/);
     return match ? match[1] : null;
@@ -13,7 +12,7 @@ export default function HigherOrLowerGame() {
     const [question, setQuestion] = useState<string | null>(null);
     const [gameScore, setGameScore] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
-    const [gameOver, setGameOver] = useState<boolean>(false); // New state for game-over screen
+    const [gameOver, setGameOver] = useState<boolean>(false);
 
     const [artistName, setArtistName] = useState<string | null>(null);
     const [otherArtistName, setOtherArtistName] = useState<string | null>(null);
@@ -24,7 +23,7 @@ export default function HigherOrLowerGame() {
     const fetchQuestion = async () => {
         setLoading(true);
         setErrorMessage(null);
-        setGameOver(false); // Reset game-over state when fetching a new question
+        setGameOver(false);
 
         try {
             const response = await fetch("http://localhost:8000/games/higher-or-lower/", {
@@ -76,7 +75,7 @@ export default function HigherOrLowerGame() {
             if (response.ok) {
                 if (data.game_over) {
                     setGameOver(true);
-                    setQuestion(data.message); // Game over message
+                    setQuestion(data.message);
                     setGameScore(data.game_score); // Final score
                 } else {
                     setGameOver(false);
@@ -98,7 +97,6 @@ export default function HigherOrLowerGame() {
         }
     };
 
-    // Fetch a question when the component is first mounted
     useEffect(() => {
         fetchQuestion();
     }, []);
@@ -111,7 +109,6 @@ export default function HigherOrLowerGame() {
             ) : errorMessage ? (
                 <p className="text-red-500">{errorMessage}</p>
             ) : gameOver ? (
-                // Show Game Over screen
                 <div className="flex flex-col items-center gap-4">
                     <p className="text-center">{question}</p>
                     <p className="mt-2">Final Score: {gameScore}</p>
@@ -123,7 +120,6 @@ export default function HigherOrLowerGame() {
                     </Button>
                 </div>
             ) : (
-                // Show the game question and options
                 <>
                     <p className="mb-4 text-center">{question}</p>
                     <div className="flex gap-4">
