@@ -11,9 +11,11 @@ from rest_framework.response import Response
 from .util import update_or_create_user_tokens, is_spotify_authenticated, get_user_tokens, save_artists_to_profile
 from django.http import HttpResponseRedirect
 from collections import Counter
-from members.models import Genre, UserGenre, Profile 
+from members.models import Genre, UserGenre, Profile, Wrapped
 from django.contrib.auth.models import User
 from django.contrib.auth import login # added so django auth works
+from datetime import datetime
+import traceback
 
 
 
@@ -133,12 +135,7 @@ class DataView(APIView):
                         }
 
                     )
-                    #print("profile is " + profile)
-                    #print("Got profile")
 
-                    # Save genres in the database
-                    #with transaction.atomic():
-                    #print(top_genres['genres'])
                     for genre_name, count in top_genres['genres']:
 
                         genre, _ = Genre.objects.get_or_create(name=genre_name)
@@ -148,6 +145,15 @@ class DataView(APIView):
                             defaults={'count': count}
                         )
                     top_genres = [genre[0] for genre in top_genres['genres']]
+
+                    Wrapped.objects.get_or_create(
+                        user = (get('https://api.spotify.com/v1/me', headers=headers).json())['display_name'],
+                        wrap_id= session_id,
+                        defaults = {
+                            'top_genres': top_genres,
+                            'date_updated': datetime.now()
+                        }
+                    )
 
                     return Response(top_genres, status=status.HTTP_200_OK)
                 except:
@@ -179,6 +185,15 @@ class DataView(APIView):
                     albums_info = [(album["name"], album["images"][0]["url"], album_top_track(album["id"], tracks)) for album in data]
                     print(albums_info)
 
+                    Wrapped.objects.get_or_create(
+                        user=(get('https://api.spotify.com/v1/me', headers=headers).json())['display_name'],
+                        wrap_id=session_id,
+                        defaults={
+                            'top_albums': albums_info,
+                            'date_updated': datetime.now()
+                        }
+                    )
+
                     return Response(albums_info, status=status.HTTP_200_OK)
                 except Exception as e:
                     print(e)
@@ -195,7 +210,17 @@ class DataView(APIView):
                         for artist_genre in artist['genres']:
                             genres.append(artist_genre)
                     counter = Counter(genres)
-                    genre_diversity = round(len(genres)/len(counter), 2) * 10
+                    genre_diversity = (round(len(genres)/len(counter), 2) - 1.8) * 10
+
+                    Wrapped.objects.get_or_create(
+                        user=(get('https://api.spotify.com/v1/me', headers=headers).json())['display_name'],
+                        wrap_id=session_id,
+                        defaults={
+                            'genre_diversity': genre_diversity,
+                            'date_updated': datetime.now()
+                        }
+                    )
+
                     return Response(genre_diversity, status=status.HTTP_200_OK)
                 except:
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
@@ -255,7 +280,7 @@ class DataView(APIView):
                 # Send request to LLM
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={LLM_TOKEN}"
                 # Define the headers and payload
-                headers = {
+                llm_headers = {
                     "Content-Type": "application/json"
                 }
                 payload = {
@@ -271,16 +296,28 @@ class DataView(APIView):
                 }
 
                 # Make the POST request
-                response = post(url, headers=headers, json=payload, params={"key": LLM_TOKEN}).json()
+                response = post(url, headers=llm_headers, json=payload, params={"key": LLM_TOKEN}).json()
                 try:
                     response_text = response['candidates'][0]['content']['parts'][0]['text']
-                    print(response_text)
+
+                    wrapped, created = Wrapped.objects.get_or_create(
+                        user=(get('https://api.spotify.com/v1/me', headers=headers).json())['display_name'],
+                        wrap_id=session_id,
+                        defaults={
+                            'user_description': response_text,
+                            'date_updated': datetime.now()
+                        }
+                    )
+                    print(wrapped)
+                    print(created)
+
                     print("llm data fetch successful")
                     return Response(response_text, status=status.HTTP_200_OK)
-                except:
+                except Exception as e:
                     print("llm data fetch failed")
                     print(response)
-                    return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+                    traceback.print_exc()
+                    return Response("LLM Service Failed", status=status.HTTP_400_BAD_REQUEST)
 
             else:
             # Direct requests that don't require additional data processing
@@ -310,6 +347,15 @@ class DataView(APIView):
                                 "user_fav_track": top_track
                             }
                             parsed_data.append(artist_info)
+
+                        Wrapped.objects.get_or_create(
+                            user=(get('https://api.spotify.com/v1/me', headers=headers).json())['display_name'],
+                            wrap_id=session_id,
+                            defaults={
+                                'top_artists': artists,
+                                'date_updated': datetime.now()
+                            }
+                        )
 
                         save_artists_to_profile(request.user, parsed_data)
 
