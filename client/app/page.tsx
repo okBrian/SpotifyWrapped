@@ -84,7 +84,7 @@ export default function Home() {
     <div className="w-full">
       <UserBlock username={displayName || ""} className="grow mb-16" userImage={userImage || ""}/>
       <Wrapped wrapped={wrappedInfo} />
-      <Footer></Footer>
+      <Footer topArtists={wrappedInfo.topArtists}></Footer>
     </div>
   )
 }
