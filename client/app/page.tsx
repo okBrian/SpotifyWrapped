@@ -9,6 +9,7 @@ import UserDescription from "./UserDescription";
 import UserBlock from "./UserBlock";
 
 import { useEffect, useState } from 'react';
+import { data } from "framer-motion/client";
 
 
 
@@ -50,7 +51,9 @@ export default function Home() {
         });
         const dataUser = await userResponse.json();
         setDisplayName(dataUser.display_name);
-        setUserImage(dataUser.images[0].url)
+        if (dataUser.images && dataUser.images[0]) {
+          setUserImage(dataUser.images[0].url);
+        }
 
         // fetching top genres
         const genreResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|top|genres"}`, {
