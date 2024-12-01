@@ -1,4 +1,6 @@
 import json
+from xmlrpc.client import ResponseError
+
 from ctypes.macholib.dyld import dyld_default_search
 from statistics import quantiles
 from urllib.error import HTTPError
@@ -139,6 +141,24 @@ class DeleteAccount(APIView):
         user.delete()
 
         return Response({'status': 'User account deleted'}, status=status.HTTP_200_OK)
+
+class DeleteWrapped(APIView):
+    def get(self, request, query):
+        session_id = request.session.session_key
+        authenticated = is_spotify_authenticated(session_id)
+        if authenticated:
+            try:
+                user_tokens = get_user_tokens(session_id)
+                headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': "Bearer " + user_tokens.access_token
+                }
+                user_id = get('https://api.spotify.com/v1/me', headers=headers).json()
+                user_id = user_id['display_name']
+                Wrapped.objects.filter(user=user_id, wrap_id=query).delete()
+                return Response({'status': 'Wrapped deleted'}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'error': 'Error deleting wrapped'}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetWrappeds(APIView):
     def get(self, request):
