@@ -9,7 +9,7 @@ export default function Top5Albums(props: {
   const { topAlbums } = props;
 
   const lang = useContext(LangContext);
-
+  console.log(topAlbums);
   return (
     <div className="max-w-full">
       <div className="flex flex-wrap gap-2 text-3xl">
