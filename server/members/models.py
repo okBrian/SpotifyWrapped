@@ -11,7 +11,7 @@ class Profile(models.Model):
     display_name = models.CharField(max_length=255, blank=True, null=True)
     profile_id = models.CharField(max_length=50, unique=True)
     url = models.URLField(max_length=500, blank=True, null=True)
-    profile_picture = models.OneToOneField('Picture', on_delete=models.CASCADE, null=True, blank=True)
+    profile_picture = models.URLField(max_length=1000)
     artists = models.ManyToManyField('Artist', related_name='top_artists_for', blank=True)
     genres = models.ManyToManyField('Genre', related_name='profiles', through='UserGenre')
     game_score = models.IntegerField(default=0)
@@ -21,20 +21,15 @@ class Profile(models.Model):
 
 class Artist(models.Model):
     name = models.CharField(max_length=255)
-    url = models.URLField(max_length=500)
-    images = models.ManyToManyField('Picture', blank=True)
+    image_url = models.URLField(max_length=500)
     popularity = models.IntegerField(default=0)
     user_fav_track = models.CharField(max_length=255, blank=True, null=True)
 
 class Album(models.Model):
     name = models.CharField(max_length=255)
-    url = models.URLField(max_length=500)
-    artists = models.ManyToManyField('Artist', blank=True)
-
-class Picture(models.Model):
-    image = models.ImageField(upload_to='Pictures/', null=True)
-    height = models.IntegerField(null=True)
-    width = models.IntegerField(null=True)
+    image_url = models.URLField(max_length=500)
+    artist = models.ForeignKey('Artist', blank=True, on_delete=models.CASCADE)
+    user_fav_track = models.CharField(max_length=255)
 
 class Genre(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -53,7 +48,7 @@ class Wrapped (models.Model):
     user_description = models.CharField(max_length=1000, default = "LLM API Failure")
     last_played = models.CharField(max_length=255)
     wrap_id = models.CharField(max_length=255, unique=True)
-    date_updated = models.DateTimeField()
+    date_updated = models.DateTimeField(null = True)
 
     def __str__(self):
         return f"{self.user} {self.top_artists.all()} {self.top_albums.all()} {self.top_genres.all()} {self.genre_diversity} {self.user_description} {self.last_played} {self.wrap_id} {self.date_updated}"
