@@ -14,23 +14,32 @@ export default function Profile() {
   const [openIndex, setOpenIndex] = useState(0);
 
   useEffect(() => {
-    // (async () => {
-    //   // fetching username
-    //   const userResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me"}`, {
-    //     credentials: 'include', // Include credentials (cookies) in the request
-    //   });
-    //   const dataUser = await userResponse.json();
-    //   setDisplayName(dataUser.display_name);
-    //   setUserImage(dataUser.images[0].url);
-    // })();
+    (async () => {
+      // fetching username
+      // const userResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|top|features"}`, {
+      //   credentials: 'include', // Include credentials (cookies) in the request
+      // });
+      // const dataUser = await userResponse.json();
+      // setDisplayName(dataUser.display_name);
+      // setUserImage(dataUser.images[0].url);
+
+      const wrappedsResponse = await fetch(`http://localhost:8000/spotify/get-wrappeds`, {
+        credentials: 'include',
+      })
+      const wrappedsData = await wrappedsResponse.json();
+      console.log(wrappedsData);
+      // const wrappeds = wrappedsData.map(w => {
+      //   
+      // });
+
+      setWrappeds([
+        DEFAULT_WRAPPED,
+        DEFAULT_WRAPPED,
+        DEFAULT_WRAPPED,
+      ]);
+    })();
 
     // TODO: fetch displayName, userImage, and wrapped information
-    console.log("run once on page load");
-    setWrappeds([
-      DEFAULT_WRAPPED,
-      DEFAULT_WRAPPED,
-      DEFAULT_WRAPPED,
-    ]);
   }, []);
 
   const handleDelete = () => {
