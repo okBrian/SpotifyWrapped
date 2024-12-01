@@ -8,8 +8,9 @@ export default function ArtistBlock(props: {
     num: number,
     artist: string,
     imageUrl: string,
+    fav_track: string
 }) {
-  const { num, artist, imageUrl} = props;
+  const { num, artist, imageUrl, fav_track} = props;
 
   const [flipped, setFlipped] = useState(false);
   const [showBack, setShowBack] = useState(false);
@@ -40,16 +41,10 @@ export default function ArtistBlock(props: {
             {artist}
           </h3>
           <p>
-            {lang.minutesListened}:
+            Favorite Track:
           </p>
           <p className="text-2xl text-primary mb-4">
-            20,000
-          </p>
-          <p>
-            Unique songs listened:
-          </p>
-          <p className="text-2xl text-primary">
-            100
+            {fav_track}
           </p>
         </div> : <>
           <p className="text-2xl font-bold">

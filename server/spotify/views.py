@@ -148,11 +148,11 @@ class DataView(APIView):
                             genre=genre,
                             defaults={'count': count}
                         )
+                    top_genres = [genre[0] for genre in top_genres['genres']]
 
                     return Response(top_genres, status=status.HTTP_200_OK)
                 except:
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
-
             elif query == "me/top/albums":
                 # Getting top albums from top tracks
                 try:
@@ -166,7 +166,19 @@ class DataView(APIView):
 
                     data = get(f'https://api.spotify.com/v1/albums', headers=headers, params = {"ids": ",".join(top_albums[0])}).json()
                     data = data["albums"]
-                    albums_info = [(album["name"], album["images"][0]["url"]) for album in data]
+
+                    tracks_data = get('https://api.spotify.com/v1/me/top/tracks?limit=50',
+                                      headers=headers).json()
+                    tracks = tracks_data['items']
+                    def album_top_track(album_id, tracks_in):
+                        top_track = "You don't seem to have one favorite!"
+                        for track in tracks_in:
+                            if album_id == track['album']['id']:
+                                top_track = track['name']
+                        return(top_track)
+
+                    albums_info = [(album["name"], album["images"][0]["url"], album_top_track(album["id"], tracks)) for album in data]
+                    print(albums_info)
 
                     return Response(albums_info, status=status.HTTP_200_OK)
                 except Exception as e:
@@ -184,10 +196,11 @@ class DataView(APIView):
                         for artist_genre in artist['genres']:
                             genres.append(artist_genre)
                     counter = Counter(genres)
-                    genre_diversity = len(genres)/len(counter)
+                    genre_diversity = round(len(genres)/len(counter), 2) * 10
                     return Response(genre_diversity, status=status.HTTP_200_OK)
                 except:
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+
             elif query == "me/top/features":
             # Deprecated feature - audio features endpoint was closed by Spotify
                 data = get('https://api.spotify.com/v1/me/top/tracks', headers=headers).json()
@@ -251,7 +264,7 @@ class DataView(APIView):
                         {
                             "parts": [
                                 {
-                                    "text": f"In 1-2 sentences describe how someone who listens to the following genres might behave. Don't talk about their music taste, but exclusively their personality and behavior: {genres}"
+                                    "text": f"In 1-2 sentences describe how someone who listens to the following genres might behave. Don't talk about their music taste, but exclusively their personality and behavior. Use 1st person pronouns like 'you'. Replace suggestions with statements, such as 'are' instead of 'might be': {genres}"
                                 }
                             ]
                         }
@@ -277,20 +290,33 @@ class DataView(APIView):
                     print(query + " data fetch successful")
                     if (query == "me/top/artists"):
                         artists = data.get("items", [])
+
                         parsed_data = []
 
+                        tracks_data = get('https://api.spotify.com/v1/me/top/tracks?limit=50',
+                                          headers=headers).json()
+                        tracks = tracks_data['items']
                         for artist in artists:
+                            artist_id = artist['id']
+                            top_track = "You don't seem to have one favorite!"
+                            for track in tracks:
+                                if artist_id == track['artists'][0]['id']:
+                                    top_track = track['name']
+                            artist["fav_track"] = top_track
+
                             artist_info = {
                                 "name": artist.get("name"),
                                 "popularity": artist.get("popularity"),
                                 "spotify_link": artist.get("external_urls", {}).get("spotify"),
+                                "user_fav_track": top_track
                             }
                             parsed_data.append(artist_info)
 
                         save_artists_to_profile(request.user, parsed_data)
 
                     return Response(data, status=status.HTTP_200_OK)
-                except:
+                except Exception as e:
+                    print(e)
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'error': 'User not authenticated'}, status=status.HTTP_403_FORBIDDEN)
