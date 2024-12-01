@@ -66,6 +66,7 @@ def spotify_callback(request, format=None):
 
     # Fetch the user profile from Spotify
     headers = {
+       'Content-Type': 'application/json',
        'Authorization': f'{token_type} {access_token}'  # Keeping original token handling intact
     }
 
@@ -92,9 +93,10 @@ def spotify_callback(request, format=None):
             'url': profile_url,
         }
     )
+    
+    return HttpResponseRedirect('http://localhost:3000/')  
 
-    #return redirect('server:spotify/login') # redirects to the '' page in the "frontend" application
-    return HttpResponseRedirect('http://localhost:3000/')
+
 
 class IsAuthenticated(APIView):
     def get(self, request, format=None):
@@ -514,7 +516,6 @@ class DataView(APIView):
                 user=user,
                 defaults={
                     'profile_id': session_id,
-
                 }
 
             )

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'spotify.apps.SpotifyConfig',
     'corsheaders',
     'members',
+    'games',
 ]
 
 MIDDLEWARE = [
