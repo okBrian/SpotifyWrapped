@@ -111,6 +111,35 @@ class Logout(APIView):
         logout(request)#Also logout this way
         return Response({'status': 'User logged out'}, status=status.HTTP_200_OK)
 
+class DeleteAccount(APIView):
+    def get(self, request, format=None):
+        session_id = request.session.session_key
+
+        #delete token
+        SpotifyToken.objects.filter(user=session_id).delete()
+        session_id = self.request.session.session_key
+
+        #delete wrappeds
+        authenticated = is_spotify_authenticated(session_id)
+        if authenticated:
+            try:
+                user_tokens = get_user_tokens(session_id)
+                headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': "Bearer " + user_tokens.access_token
+                }
+                user_id = get('https://api.spotify.com/v1/me', headers=headers).json()
+                user_id = user_id['display_name']
+                Wrapped.objects.filter(user=user_id).delete()
+            except:
+                pass
+
+        request.session.flush()
+        user = request.user
+        user.delete()
+
+        return Response({'status': 'User account deleted'}, status=status.HTTP_200_OK)
+
 class GetWrappeds(APIView):
     def get(self, request):
         session_id = self.request.session.session_key
