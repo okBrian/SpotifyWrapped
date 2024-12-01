@@ -58,8 +58,9 @@ def spotify_callback(request, format=None):
 
     # Fetch the user profile from Spotify
     headers = {
-        'Authorization': f'{token_type} {access_token}'  # Keeping original token handling intact
+       'Authorization': f'{token_type} {access_token}'  # Keeping original token handling intact
     }
+
     user_data = get('https://api.spotify.com/v1/me', headers=headers).json()
 
     # get user info from Spotify response

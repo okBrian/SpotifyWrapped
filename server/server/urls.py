@@ -22,4 +22,5 @@ app_name = 'server'  # This registers the 'server' namespace
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('spotify/', include('spotify.urls')),
+    path('games/', include('games.urls')),
 ]
