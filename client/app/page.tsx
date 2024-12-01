@@ -4,7 +4,7 @@ import UserBlock from "./UserBlock";
 import { useEffect, useState } from 'react';
 import { DEFAULT_WRAPPED, WrappedInfo } from "@/util/types";
 import Wrapped from "./Wrapped";
-
+import Footer from "./Footer"
 
 
 export default function Home() {
@@ -84,6 +84,7 @@ export default function Home() {
     <div className="w-full">
       <UserBlock username={displayName || ""} className="grow mb-16" userImage={userImage || ""}/>
       <Wrapped wrapped={wrappedInfo} />
+      <Footer></Footer>
     </div>
   )
 }
