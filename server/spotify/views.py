@@ -566,6 +566,7 @@ class DataView(APIView):
                 try:
                     data = get(('https://api.spotify.com/v1/' + query), headers=headers).json()
                     print(query + " data fetch successful")
+                    return Response(data, status=status.HTTP_200_OK)
                 except Exception as e:
                     print(e)
                     return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
