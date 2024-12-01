@@ -42,7 +42,7 @@ export default function Top5Artists(props: {
             }
             back={
               <div className="w-full -scale-x-100 flex flex-col items-start">
-                <h3 className="text-xl mb-4">
+                <h3 className="text-xl mb-4 text-left">
                   {topArtists[i].name || ""}
                 </h3>
                 <p>
