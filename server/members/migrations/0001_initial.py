@@ -39,6 +39,20 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='Album',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=255)),
+                ('url', models.URLField(max_length=500)),
+                ('artists', models.ManyToManyField(blank=True, to='members.artist')),
+            ],
+        ),
+        migrations.AddField(
+            model_name='artist',
+            name='images',
+            field=models.ManyToManyField(blank=True, to='members.picture'),
+        ),
+        migrations.CreateModel(
             name='Profile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -46,6 +60,8 @@ class Migration(migrations.Migration):
                 ('profile_id', models.CharField(max_length=50, unique=True)),
                 ('url', models.URLField(blank=True, max_length=500, null=True)),
                 ('artists', models.ManyToManyField(blank=True, related_name='top_artists_for', to='members.artist')),
+                ('profile_picture', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='members.picture')),
+                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
@@ -61,29 +77,5 @@ class Migration(migrations.Migration):
             model_name='profile',
             name='genres',
             field=models.ManyToManyField(related_name='profiles', through='members.UserGenre', to='members.genre'),
-        ),
-        migrations.AddField(
-            model_name='profile',
-            name='profile_picture',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='members.picture'),
-        ),
-        migrations.AddField(
-            model_name='profile',
-            name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL),
-        ),
-        migrations.AddField(
-            model_name='artist',
-            name='images',
-            field=models.ManyToManyField(blank=True, to='members.picture'),
-        ),
-        migrations.CreateModel(
-            name='Album',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('url', models.URLField(max_length=500)),
-                ('artists', models.ManyToManyField(blank=True, to='members.artist')),
-            ],
         ),
     ]

@@ -6,6 +6,7 @@ import { lang } from "@/util/languages";
 
 
 export const LangContext = createContext(lang("English"));
+export const DarkContext = createContext(true);
 
 export default function DarkModeProvider(props: {
   children: ReactNode,
@@ -20,10 +21,12 @@ export default function DarkModeProvider(props: {
         ? " dark bg-bg text-white border-dark-border"
         : " bg-white text-surface border-light-border")}>
       <LangContext.Provider value={lang(language)}>
-        <Header dark={dark} setDark={setDark} language={language} setLanguage={setLanguage} />
-        <div className="w-[80rem] max-w-full h-full p-4 pt-16">
-          {children}
-        </div>
+        <DarkContext.Provider value={dark}>
+          <Header dark={dark} setDark={setDark} language={language} setLanguage={setLanguage} />
+          <div className="w-[80rem] max-w-full h-full p-4 pt-16">
+            {children}
+          </div>
+        </DarkContext.Provider>
       </LangContext.Provider>
     </div>
   )
