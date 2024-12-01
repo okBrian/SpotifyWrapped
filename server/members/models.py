@@ -13,6 +13,7 @@ class Profile(models.Model):
     artists = models.ManyToManyField('Artist', related_name='top_artists_for', blank=True)
     genres = models.ManyToManyField('Genre', related_name='profiles', through='UserGenre')
     game_score = models.IntegerField(default=0)
+    top_score = models.IntegerField(default=0)
 
     def __str__(self):
         return self.user.username

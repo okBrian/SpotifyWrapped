@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from members.models import Profile, Artist
 from django.shortcuts import get_object_or_404
+from .models import Leaderboard
 
 
 class HigherOrLowerGame(APIView):
@@ -28,7 +29,7 @@ class HigherOrLowerGame(APIView):
             other_artist = artist1
 
         question_data = {
-            'question': f"Does {question_artist.name} have more followers than {other_artist.name}?",
+            'question': f"Does {question_artist.name} have more or less followers than {other_artist.name}?",
             'artist_name': question_artist.name,
             'other_artist_name': other_artist.name,
             'artist_followers': question_artist.popularity,
@@ -56,14 +57,13 @@ class HigherOrLowerGame(APIView):
 
     def post(self, request):
         user_profile = get_object_or_404(Profile, user=request.user)
-        """
-        if user_profile.game_score == 0:
-            return Response({
-                'message': 'Game Over! Your score is: 0',
-                'game_score': user_profile.game_score,
-                'game_over': True  # Explicitly flag game-over state
-            }, status=status.HTTP_200_OK)
-        """
+
+        # Check if the user's current game score is their new high score
+        leaderboard, created = Leaderboard.objects.get_or_create(profile=user_profile)
+        if user_profile.game_score > leaderboard.high_score:
+            leaderboard.high_score = user_profile.game_score
+            leaderboard.save()
+
         answer = request.data.get('answer')
         artist_followers = request.data.get('artist_followers')
         other_artist_followers = request.data.get('other_artist_followers')
@@ -95,7 +95,7 @@ class HigherOrLowerGame(APIView):
             question_artist, other_artist = (artist1, artist2) if choice([True, False]) else (artist2, artist1)
 
             next_question_data = {
-                'question': f"Does {question_artist.name} have more followers than {other_artist.name}?",
+                'question': f"Does {question_artist.name} have more or less followers than {other_artist.name}?",
                 'artist_name': question_artist.name,
                 'other_artist_name': other_artist.name,
                 'artist_followers': question_artist.popularity,
@@ -115,6 +115,8 @@ class HigherOrLowerGame(APIView):
         else:
             #   reset score and end game
             last_attempt = user_profile.game_score
+            if last_attempt > user_profile.top_score:
+                user_profile.top_score = last_attempt
             user_profile.game_score = 0
             user_profile.save()
 
@@ -123,3 +125,10 @@ class HigherOrLowerGame(APIView):
                 'game_score': last_attempt,
                 'game_over': True  # game over state
             }, status=status.HTTP_200_OK)
+
+class LeaderboardView(APIView):
+    def get(self, request):
+        top_scores = Profile.objects.filter(top_score__gt=0).order_by('-game_score')[:10]
+        leaderboard = [{"username": profile.display_name, "score": profile.top_score} for profile in top_scores]
+        print(leaderboard)
+        return Response({"leaderboard": leaderboard}, status=status.HTTP_200_OK)

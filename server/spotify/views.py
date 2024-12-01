@@ -58,6 +58,7 @@ def spotify_callback(request, format=None):
 
     # Fetch the user profile from Spotify
     headers = {
+       'Content-Type': 'application/json',
        'Authorization': f'{token_type} {access_token}'  # Keeping original token handling intact
     }
 
@@ -84,8 +85,7 @@ def spotify_callback(request, format=None):
             'url': profile_url,
         }
     )
-
-    #return redirect('server:spotify/login') # redirects to the '' page in the "frontend" application
+    
     return HttpResponseRedirect('http://localhost:3000/')  
 
 
@@ -134,12 +134,7 @@ class DataView(APIView):
                         }
 
                     )
-                    #print("profile is " + profile)
-                    #print("Got profile")
 
-                    # Save genres in the database
-                    #with transaction.atomic():
-                    #print(top_genres['genres'])
                     for genre_name, count in top_genres['genres']:
 
                         genre, _ = Genre.objects.get_or_create(name=genre_name)

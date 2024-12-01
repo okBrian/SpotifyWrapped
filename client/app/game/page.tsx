@@ -13,12 +13,39 @@ export default function HigherOrLowerGame() {
     const [gameScore, setGameScore] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
     const [gameOver, setGameOver] = useState<boolean>(false);
+    const [leaderboard, setLeaderboard] = useState<any[]>([]); // to store leaderboard data
+    const [leaderboardLoaded, setLeaderboardLoaded] = useState<boolean>(false); // track leaderboard data load
 
     const [artistName, setArtistName] = useState<string | null>(null);
     const [otherArtistName, setOtherArtistName] = useState<string | null>(null);
     const [artistFollowers, setArtistFollowers] = useState<number | null>(null);
     const [otherArtistFollowers, setOtherArtistFollowers] = useState<number | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    // Fetch the leaderboard data
+    const fetchLeaderboard = async () => {
+        try {
+            const response = await fetch("http://localhost:8000/games/leaderboard/", {
+                credentials: "include",
+            });
+            const data = await response.json();
+            if (response.ok) {
+                console.log(data['leaderboard'])
+                if (data['leaderboard'].length > 0) {
+                    setLeaderboardLoaded(true);
+                } else {
+                    setLeaderboardLoaded(false)
+                }
+                setLeaderboard(data['leaderboard']);
+                console.log(leaderboard.length)
+            } else {
+                setErrorMessage(data.message || "Failed to load leaderboard.");
+            }
+        } catch (error) {
+            console.error("Error fetching leaderboard:", error);
+            setErrorMessage("Failed to load leaderboard. Please try again later.");
+        }
+    };
 
     const fetchQuestion = async () => {
         setLoading(true);
@@ -40,7 +67,6 @@ export default function HigherOrLowerGame() {
             } else {
                 setQuestion(data.message || "Unable to load the game.");
             }
-            console.log(artistName)
         } catch (error) {
             console.error("Error fetching game data:", error);
             setErrorMessage("Failed to load the game. Please try again later.");
@@ -86,6 +112,7 @@ export default function HigherOrLowerGame() {
                     setArtistFollowers(data.artist_followers);
                     setOtherArtistFollowers(data.other_artist_followers);
                 }
+                fetchLeaderboard();
             } else {
                 setErrorMessage(data.message || "Something went wrong. Please try again.");
             }
@@ -99,11 +126,13 @@ export default function HigherOrLowerGame() {
 
     useEffect(() => {
         fetchQuestion();
+        fetchLeaderboard();
     }, []);
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center p-4">
-            <h1 className="text-2xl mb-4 font-bold">Higher or Lower</h1>
+        <div className="w-full h-full flex flex-col items-center justify-center p-4 text-white">
+            <h1 className="text-3xl mb-6 font-bold text-center">Higher or Lower</h1>
+
             {loading ? (
                 <p>Loading...</p>
             ) : errorMessage ? (
@@ -121,24 +150,40 @@ export default function HigherOrLowerGame() {
                 </div>
             ) : (
                 <>
-                    <p className="mb-4 text-center">{question}</p>
-                    <div className="flex gap-4">
+                    <p className="mb-4 text-center text-xl">{question}</p>
+                    <div className="flex gap-4 mb-6">
                         <Button
                             onPress={() => submitAnswer("higher")}
-                            className="bg-success rounded-lg text-white"
+                            className="bg-green-500 rounded-lg text-white"
                         >
-                            Higher
+                            More
                         </Button>
                         <Button
                             onPress={() => submitAnswer("lower")}
-                            className="bg-danger rounded-lg text-white"
+                            className="bg-red-500 rounded-lg text-white"
                         >
-                            Lower
+                            Less
                         </Button>
                     </div>
-                    <p className="mt-4">Current Score: {gameScore}</p>
+                    <p className="mt-4 text-center text-lg">Current Score: {gameScore}</p>
                 </>
             )}
+
+            {/* Leaderboard Section */}
+            <div className="leaderboard-container mt-8 bg-gray-800 p-4 rounded-lg shadow-lg max-w-sm w-full">
+                <h2 className="text-2xl font-bold text-white">Leaderboard</h2>
+                {leaderboardLoaded ? (
+                    <div className="mt-4">
+                        {leaderboard.map((entry, index) => (
+                            <p key={index} className="text-lg text-white">
+                                {entry.username}: {entry.score}
+                            </p>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-white">No leaderboard data available</p>
+                )}
+            </div>
         </div>
     );
 }
