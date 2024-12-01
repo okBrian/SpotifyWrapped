@@ -46,7 +46,7 @@ class Wrapped (models.Model):
     top_albums = models.ManyToManyField(Album, related_name='wrapped_top_albums')
     top_genres = models.ManyToManyField(Genre, related_name='wrapped_top_genres')
     genre_diversity = models.FloatField(default=20)
-    user_description = models.CharField(max_length=1000, default = "LLM API Failure")
+    user_description = models.JSONField(max_length=5000, default = {"english": "LLM API Failure", "korean": "엘엘엠 API 실패", "chinese": "LLM API 失败"})
     last_played = models.CharField(max_length=255)
     wrap_id = models.CharField(max_length=255, unique=True)
     date_updated = models.DateTimeField(null = True)

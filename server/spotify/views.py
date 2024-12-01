@@ -463,7 +463,36 @@ class CreateWrapped(APIView):
 
                 # Make the POST request
                 response = post(url, headers=llm_headers, json=payload, params={"key": LLM_TOKEN}).json()
-                response_text = response['candidates'][0]['content']['parts'][0]['text']
+                english_response_text = response['candidates'][0]['content']['parts'][0]['text']
+
+                payload = {
+                    "contents": [
+                        {
+                            "parts": [
+                                {
+                                    "text": f"translate this into korean, returning only the text in korean:: {english_response_text}"
+                                }
+                            ]
+                        }
+                    ]
+                }
+                response = post(url, headers=llm_headers, json=payload, params={"key": LLM_TOKEN}).json()
+                korean_response_text = response['candidates'][0]['content']['parts'][0]['text']
+
+
+                payload = {
+                    "contents": [
+                        {
+                            "parts": [
+                                {
+                                    "text": f"translate this into chinese, returning only the text in chinese:: {english_response_text}"
+                                }
+                            ]
+                        }
+                    ]
+                }
+                response = post(url, headers=llm_headers, json=payload, params={"key": LLM_TOKEN}).json()
+                chinese_response_text = response['candidates'][0]['content']['parts'][0]['text']
 
                 user_data = get('https://api.spotify.com/v1/me', headers=headers).json()
                 user_display_name = user_data['display_name']
@@ -472,13 +501,14 @@ class CreateWrapped(APIView):
                     user=user_display_name,
                     wrap_id=session_id,
                     defaults={
-                        'user_description': response_text,
+                        'user_description': {"english": english_response_text, "korean": korean_response_text, "chinese": chinese_response_text},
                         'date_updated': make_aware(datetime.now())
                     }
                 )
                 if not created:
                     # Update the existing object
-                    wrapped.user_description = response_text
+                    wrapped.user_description = {"english": english_response_text, "korean": korean_response_text, "chinese": chinese_response_text},
+                    wrapped.date_updated = make_aware(datetime.now())
                     wrapped.save()
 
 
