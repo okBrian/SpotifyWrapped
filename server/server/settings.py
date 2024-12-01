@@ -60,10 +60,21 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # React frontend
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'https://localhost:3000',  # If you're using HTTPS locally
+]
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 CORS_ALLOW_CREDENTIALS = True 
-CSRF_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_HTTPONLY = False
+
+# Session Settings
+SESSION_COOKIE_SAMESITE = 'None'  # Required for cross-origin cookies
+SESSION_COOKIE_SECURE = True     # Use True in production with HTTPS
+
+# CSRF Settings
+CSRF_COOKIE_SAMESITE = 'None'  # Required for cross-origin cookies
+CSRF_COOKIE_SECURE = True     # Use True in production with HTTPS
 
 TEMPLATES = [
     {
