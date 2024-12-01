@@ -13,10 +13,12 @@ from .util import update_or_create_user_tokens, is_spotify_authenticated, get_us
 from django.http import HttpResponseRedirect
 from collections import Counter
 from members.models import Genre, UserGenre, Profile, Wrapped, Artist, Album
+from members.serializers import WrappedSerializer
 from spotify.models import SpotifyToken
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout # added so django auth works
 from datetime import datetime
+from django.utils.timezone import make_aware
 import traceback
 
 
@@ -166,7 +168,7 @@ class CreateWrapped(APIView):
                         wrap_id=session_id
                     )
                     wrapped.top_artists.set(artists)
-                    wrapped.date_updated = datetime.now()
+                    wrapped.date_updated = make_aware(datetime.now())
                     wrapped.save()
 
                     save_artists_to_profile(request.user, parsed_data)
@@ -211,7 +213,7 @@ class CreateWrapped(APIView):
                     user=user_display_name,
                     wrap_id=session_id,
                     defaults={
-                        'date_updated': datetime.now()
+                        'date_updated': make_aware(datetime.now())
                     }
                 )
                 wrapped.top_artists.set(artists)
@@ -254,11 +256,10 @@ class CreateWrapped(APIView):
                     user=user_display_name,
                     wrap_id=session_id,
                     defaults = {
-                        'date_updated': datetime.now()
+                        'date_updated': make_aware(datetime.now())
                     }
                 )
                 wrapped.top_genres.set(top_genres)
-                wrapped.date_updated = datetime.now()
                 wrapped.save()
 
                 # Getting top albums
@@ -303,11 +304,10 @@ class CreateWrapped(APIView):
                     user=user_display_name,
                     wrap_id=session_id,
                     defaults={
-                        'date_updated': datetime.now()
+                        'date_updated': make_aware(datetime.now())
                     }
                 )
                 wrapped.top_albums.set(albums)
-                wrapped.date_updated = datetime.now()
                 wrapped.save()
 
                 #Calculating genre diversity
@@ -319,7 +319,8 @@ class CreateWrapped(APIView):
                     for artist_genre in artist['genres']:
                         genres.append(artist_genre)
                 counter = Counter(genres)
-                genre_diversity = ((round(len(genres) / len(counter), 2) - 1.8) * 10)
+                genre_diversity = ((round(len(genres) / len(counter), 2)) * 10)
+                print("Genre Diversity", genre_diversity)
 
                 user_data = get('https://api.spotify.com/v1/me', headers=headers).json()
                 user_display_name = user_data['display_name']
@@ -328,12 +329,35 @@ class CreateWrapped(APIView):
                     user=user_display_name,
                     wrap_id=session_id,
                     defaults={
-                        'date_updated': datetime.now()
+                        'genre_diversity': genre_diversity,
+                        'date_updated': make_aware(datetime.now())
                     }
                 )
-                wrapped.genre_diversity = (genre_diversity)
-                wrapped.date_updated = datetime.now()
-                wrapped.save()
+                if not created:
+                    # Update the existing object
+                    wrapped.genre_diversity = genre_diversity
+                    wrapped.save()
+
+                #Getting last played track
+                data = get('https://api.spotify.com/v1/me/player/recently-played', headers=headers).json()
+                data = data['items'][0]
+                track_str = f"{data['name']} by {data['artists'][0]['name']}"
+
+                user_data = get('https://api.spotify.com/v1/me', headers=headers).json()
+                user_display_name = user_data['display_name']
+
+                wrapped, created = Wrapped.objects.get_or_create(
+                    user=user_display_name,
+                    wrap_id=session_id,
+                    defaults={
+                        'last_played': track_str,
+                        'date_updated': make_aware(datetime.now())
+                    }
+                )
+                if not created:
+                    # Update the existing object
+                    wrapped.last_played = track_str
+                    wrapped.save()
 
                 #Getting LLM description
                 data = get('https://api.spotify.com/v1/me/top/artists', headers=headers).json()
@@ -373,19 +397,20 @@ class CreateWrapped(APIView):
                     wrap_id=session_id,
                     defaults={
                         'user_description': response_text,
-                        'date_updated': datetime.now()
+                        'date_updated': make_aware(datetime.now())
                     }
                 )
                 if not created:
                     # Update the existing object
                     wrapped.user_description = response_text
-                    wrapped.date_updated = datetime.now()
                     wrapped.save()
 
 
                 print("llm data fetch successful")
 
                 wrapped = Wrapped.objects.filter(user=user_display_name).order_by('-date_updated').first()
+                wrapped = WrappedSerializer(wrapped).data
+                print(wrapped)
                 return Response(wrapped, status=status.HTTP_200_OK)
 
             except Exception as e:
