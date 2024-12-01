@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import AuthURL, spotify_callback, IsAuthenticated, DataView, Logout, CreateWrapped
+from .views import AuthURL, spotify_callback, IsAuthenticated, DataView, Logout, CreateWrapped, GetWrappeds
 
 urlpatterns = [
     path('get-auth-url', AuthURL.as_view()),
@@ -8,5 +8,6 @@ urlpatterns = [
     path('get-data/<str:query>', DataView.as_view(), name = "get-data"),
     #path('games/', include('games.urls'))
     path('logout', Logout.as_view()),
-    path('create-wrapped', CreateWrapped.as_view(), name = 'create-wrapped')
+    path('create-wrapped', CreateWrapped.as_view(), name = 'create-wrapped'),
+    path('get-wrappeds', GetWrappeds.as_view(), name = 'get-wrappeds')
 ]

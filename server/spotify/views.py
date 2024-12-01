@@ -111,6 +111,34 @@ class Logout(APIView):
         logout(request)#Also logout this way
         return Response({'status': 'User logged out'}, status=status.HTTP_200_OK)
 
+class GetWrappeds(APIView):
+    def get(self, request):
+        session_id = self.request.session.session_key
+        authenticated = is_spotify_authenticated(session_id)
+        if authenticated:
+            try:
+                user_tokens = get_user_tokens(session_id)
+                headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': "Bearer " + user_tokens.access_token
+                }
+                user_id = get('https://api.spotify.com/v1/me', headers=headers).json()
+                user_id = user_id['display_name']
+                try:
+                    wrappeds = []
+                    for wrap in list(Wrapped.objects.filter(user = user_id)):
+                        wrap_serialized = WrappedSerializer(wrap).data
+                        wrappeds.append(wrap_serialized)
+                    wrappeds = {'items': wrappeds}
+                    return Response(wrappeds, status=status.HTTP_200_OK)
+                except Wrapped.DoesNotExist:
+                    return Response({"No data yet"}, status=status.HTTP_200_OK)
+            except Exception as e:
+                print(e)
+                return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'User not authenticated'}, status=status.HTTP_403_FORBIDDEN)
+
 class CreateWrapped(APIView):
     def get(self, request):
         session_id = self.request.session.session_key
@@ -264,7 +292,6 @@ class CreateWrapped(APIView):
 
                 # Getting top albums
                 data = get('https://api.spotify.com/v1/me/top/tracks?limit=50', headers=headers).json()
-                print("data fetch successful")
                 tracks = data['items']
                 albums = [track['album']['id'] for track in tracks]
                 counter = Counter(albums)
@@ -312,7 +339,6 @@ class CreateWrapped(APIView):
 
                 #Calculating genre diversity
                 data = get('https://api.spotify.com/v1/me/top/artists', headers=headers).json()
-                print("data fetch successful")
                 data = data['items']
                 genres = []
                 for artist in data:
@@ -320,7 +346,6 @@ class CreateWrapped(APIView):
                         genres.append(artist_genre)
                 counter = Counter(genres)
                 genre_diversity = ((round(len(genres) / len(counter), 2)) * 10)
-                print("Genre Diversity", genre_diversity)
 
                 user_data = get('https://api.spotify.com/v1/me', headers=headers).json()
                 user_display_name = user_data['display_name']
@@ -340,7 +365,7 @@ class CreateWrapped(APIView):
 
                 #Getting last played track
                 data = get('https://api.spotify.com/v1/me/player/recently-played', headers=headers).json()
-                data = data['items'][0]
+                data = data['items'][0]['track']
                 track_str = f"{data['name']} by {data['artists'][0]['name']}"
 
                 user_data = get('https://api.spotify.com/v1/me', headers=headers).json()
@@ -410,7 +435,7 @@ class CreateWrapped(APIView):
 
                 wrapped = Wrapped.objects.filter(user=user_display_name).order_by('-date_updated').first()
                 wrapped = WrappedSerializer(wrapped).data
-                print(wrapped)
+                print("Wrap successfully generated!")
                 return Response(wrapped, status=status.HTTP_200_OK)
 
             except Exception as e:
@@ -418,7 +443,6 @@ class CreateWrapped(APIView):
                 return Response({'error': 'Error fetching data'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'error': 'User not authenticated'}, status=status.HTTP_403_FORBIDDEN)
-
 
 class DataView(APIView):
     def get(self, request, query):
