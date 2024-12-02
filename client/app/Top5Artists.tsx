@@ -46,7 +46,7 @@ export default function Top5Artists(props: {
                   {topArtists[i].name || ""}
                 </h3>
                 <p>
-                  Popularity:
+                  {lang.pop}:
                 </p>
                 <p className="text-2xl text-primary mb-4">
                   {topArtists[i].popularity}

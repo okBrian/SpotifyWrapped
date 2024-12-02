@@ -15,9 +15,9 @@ export default function TopGenre(props: {
       <div className="flex flex-wrap gap-2 text-3xl">
         <p>{lang.your}</p>
         <p className="text-secondary">
-          Top
+          {lang.top}
         </p>
-        <p>Genres:</p>
+        <p>{lang.genres}:</p>
       </div>
       <p className="text-2xl text-primary mt-8">
         {topGenres.map(g => g.name.toLowerCase()
