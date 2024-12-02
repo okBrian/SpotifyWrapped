@@ -1,12 +1,13 @@
 "use client"; // This makes the component a Client Component
 
 import UserBlock from "./UserBlock";
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { DEFAULT_WRAPPED, WrappedInfo } from "@/util/types";
 import Wrapped from "./Wrapped";
 import { parseWrapped } from "@/util/helpers";
 import { Button } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
+import { LangContext } from "./DarkModeProvider";
 
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   const { push } = useRouter();
+  const lang = useContext(LangContext);
 
   const generate = () => {
     (async () => {
@@ -82,7 +84,7 @@ export default function Home() {
             onPress={() => generate()}
             className="bg-primary rounded-lg font-bold text-white"
           >
-            Generate New Wrapped
+            {lang.generateNew}
           </Button>
         </div>
         <Wrapped wrapped={wrappedInfo} />

@@ -18,7 +18,7 @@ export default function Top5Albums(props: {
         <p className="text-secondary">
           {lang.top5}
         </p>
-        <p>Albums:</p>
+        <p>{lang.albums}:</p>
       </div>
       
       <div className="flex gap-4 overflow-x-scroll px-3 py-6 grow">
@@ -46,7 +46,7 @@ export default function Top5Albums(props: {
                   {topAlbums[i].name || ""}
                 </h3>
                 <p>
-                  Favorite Track:
+                  {lang.favTrack}
                 </p>
                 <p className="text-2xl text-primary mb-4">
                   {topAlbums[i].userFavTrack || ""}

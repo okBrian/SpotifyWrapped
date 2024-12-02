@@ -23,10 +23,10 @@ export default function UserDescription(props: {
   return (
     <div className="max-w-full">
       <div className="flex flex-wrap gap-2 text-3xl">
-        <p>What's Your</p>
+        <p>{lang.whatsYour}</p>
         <div className="flex">
           <p className="text-secondary">
-            Music Personality
+            {lang.musicPers}
           </p>
           <p>?</p>
         </div>
