@@ -1,10 +1,11 @@
 import { useContext } from "react";
 import FlipCard from "./FlipCard";
 import { LangContext } from "./DarkModeProvider";
+import { Artist } from "@/util/types";
 
 
 export default function Top5Artists(props: {
-  topArtists: string[][],
+  topArtists: Artist[],
 }) {
   const { topArtists } = props;
 
@@ -17,7 +18,7 @@ export default function Top5Artists(props: {
         <p className="text-secondary">
           {lang.top5}
         </p>
-        <p>{lang.artists}</p>
+        <p>{lang.artists}:</p>
       </div>
       
       <div className="flex gap-4 overflow-x-scroll px-3 py-6 grow">
@@ -30,10 +31,10 @@ export default function Top5Artists(props: {
                   {i + 1}
                 </p>
                 <p className="text-lg mb-4">
-                  {topArtists[i][0] || ""}
+                  {topArtists[i].name || ""}
                 </p>
-                {(topArtists[i][1] || "") ? (
-                  <img src={topArtists[i][1]} className="w-full h-full object-cover rounded-lg" />
+                {(topArtists[i].imageUrl || "") ? (
+                  <img src={topArtists[i].imageUrl} className="w-full h-full object-cover rounded-lg" />
                 ) : (
                   <div className="w-full h-full rounded-lg bg-error" />
                 )}
@@ -41,14 +42,14 @@ export default function Top5Artists(props: {
             }
             back={
               <div className="w-full -scale-x-100 flex flex-col items-start">
-                <h3 className="text-xl mb-4">
-                  {topArtists[i][0] || ""}
+                <h3 className="text-xl mb-4 text-left">
+                  {topArtists[i].name || ""}
                 </h3>
                 <p>
-                  Favorite Track:
+                  Popularity:
                 </p>
                 <p className="text-2xl text-primary mb-4">
-                  {topArtists[i][2] || ""}
+                  {topArtists[i].popularity}
                 </p>
               </div>
             }

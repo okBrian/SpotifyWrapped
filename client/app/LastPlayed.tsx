@@ -16,7 +16,7 @@ export default function LastPlayed(props: {
         <p className="text-secondary">
           Last Played
         </p>
-        <p>Song</p>
+        <p>Song:</p>
       </div>
       <p className="text-2xl text-primary mt-12">
         {recentTrack || "Song"}
