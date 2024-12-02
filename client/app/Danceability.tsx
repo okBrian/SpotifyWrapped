@@ -20,14 +20,14 @@ export default function Danceability() {
           <p className="text-2xl text-primary w-48">
             {lang.danceability}:
           </p>
-          <FillBar width="w-[200px]" />
+          <FillBar width="w-3/5" />
         </div>
         
         <div className="flex gap-6 items-center">
           <p className="text-2xl text-primary w-48">
             {lang.energy}:
           </p>
-          <FillBar width="w-[250px]" />
+          <FillBar width="w-3/4" />
         </div>
 
         <p className="text-2xl text-primary mt-6">

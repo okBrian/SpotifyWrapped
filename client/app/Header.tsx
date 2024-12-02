@@ -5,6 +5,8 @@ import { GrGlobe } from "react-icons/gr";
 import { LANGUAGES } from "@/util/languages";
 import { useContext } from "react";
 import { LangContext } from "./DarkModeProvider";
+import Link from "next/link";
+import { MdHome } from "react-icons/md";
 
 
 export default function Header(props: {
@@ -18,12 +20,20 @@ export default function Header(props: {
   const lang = useContext(LangContext);
 
   return (
-    <div className="w-full h-16 flex justify-center items-center border-b-2 border-light-border dark:border-dark-border">
-      <div className="w-full" />
-      <p className="text-3xl whitespace-nowrap">
-        Spotify Wrapped
-      </p>
-      <div className="w-full flex justify-end pr-6 dark:text-white">
+    <div className="w-full h-16 px-4 flex justify-center items-center border-b-2 border-light-border dark:border-dark-border">
+      <div className="whitespace-nowrap grow">
+        <p className="hidden md:block text-3xl hover:underline hover:cursor-pointer">
+          <Link href="/">
+            Spotify Wrapped
+          </Link>
+        </p>
+        <div className="block md:hidden hover:cursor-pointer w-min">
+          <Link href="/">
+            <MdHome size="30" />
+          </Link>
+        </div>
+      </div>
+      <div className="flex justify-end dark:text-white">
         <Dropdown>
           <DropdownTrigger>
             <Button 

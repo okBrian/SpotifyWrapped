@@ -46,6 +46,8 @@ const ENGLISH: LanguageType = {
   balanced: "balanced",
   diverse2: "diverse",
   universal: "univseral",
+  viewProfile: "View Profile",
+  loginWith: "Login With",
 };
 
 const CHINESE: LanguageType = {
@@ -93,6 +95,8 @@ const CHINESE: LanguageType = {
   balanced: "均衡",
   diverse2: "各种各样的",
   universal: "普遍的",
+  viewProfile: "查看个人资料",
+  loginWith: "登录",
 };
 
 const KOREAN: LanguageType = {
@@ -140,6 +144,8 @@ const KOREAN: LanguageType = {
   balanced: "균형 잡힌",
   diverse2: "다양한",
   universal: "만능인",
+  viewProfile: "프로필 보기",
+  loginWith: "다음으로 로그인",
 };
 
 export const LANGUAGES: Record<Language, LanguageType> = {

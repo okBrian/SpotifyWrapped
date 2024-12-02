@@ -119,7 +119,7 @@ export default function Profile() {
       <CenteredModal
         isOpen={wrappedOpen}
         setIsOpen={setWrappedOpen}
-        className="p-12 rounded-xl w-full max-w-[60rem]"
+        className="p-4 md:p-12 rounded-xl w-full max-w-[60rem]"
       >
         <Wrapped wrapped={wrappeds[openIndex]} />
       </CenteredModal>
