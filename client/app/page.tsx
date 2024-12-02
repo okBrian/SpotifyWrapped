@@ -1,79 +1,74 @@
 "use client"; // This makes the component a Client Component
 
 import UserBlock from "./UserBlock";
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { DEFAULT_WRAPPED, WrappedInfo } from "@/util/types";
 import Wrapped from "./Wrapped";
 import Footer from "./Footer"
-
+import { parseWrapped } from "@/util/helpers";
+import { Button } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
+import { LangContext } from "./DarkModeProvider";
 
 export default function Home() {
-  const [displayName, setDisplayName] = useState<string | null>("John Doe");
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [userImage, setUserImage] = useState<string | null>(null);
   const [wrappedInfo, setWrappedInfo] = useState<WrappedInfo>(DEFAULT_WRAPPED);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const { push } = useRouter();
+  const lang = useContext(LangContext);
+
+  const generate = () => {
+    (async () => {
+      const newWrappedRes = await fetch("http://localhost:8000/spotify/create-wrapped", {
+        credentials: "include",
+      });
+      const newWrappedData = await newWrappedRes.json();
+      setWrappedInfo({...parseWrapped(newWrappedData)});
+      console.log("Pressed generate button, new wrapped:");
+      console.log(newWrappedData);
+    })();
+  }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-
-        // fetching username
-        const userResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me"}`, {
-          credentials: 'include', // Include credentials (cookies) in the request
+        // fetching username and profile picture
+        const userRes = await fetch("http://localhost:8000/spotify/get-data/me", {
+          credentials: "include", // Include credentials (cookies) in the request
         });
-        const dataUser = await userResponse.json();
-        setDisplayName(dataUser.display_name);
-        if (dataUser.images && dataUser.images[0]) {
-          setUserImage(dataUser.images[0].url);
+        const userData = await userRes.json();
+        setDisplayName(userData.display_name);
+        if (userData.images && userData.images[0]) {
+          setUserImage(userData.images[0].url);
         }
 
-        // fetching top genres
-        const genreResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|top|genres"}`, {
-          credentials: 'include', // Include credentials (cookies) in the request
+        // fetching all wrappeds
+        const wrappedsRes = await fetch("http://localhost:8000/spotify/get-wrappeds", {
+          credentials: "include",
         });
-        const dataGenres = await genreResponse.json();
-        wrappedInfo.topGenres = dataGenres;
-
-        // fetching genre diversity score
-        const genreDiversityResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|genre_diversity"}`, {
-          credentials: 'include', // Include credentials (cookies) in the request
-        });
-        const dataGenreDiversity = await genreDiversityResponse.json();
-        wrappedInfo.genreDiversity = dataGenreDiversity;
-
-        // fetching most recently played track
-        const trackResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|player|recently-played?limit=1"}`, {
-          credentials: 'include', // Include credentials (cookies) in the request
-        });
-        const dataTrack = await trackResponse.json();
-        wrappedInfo.recentTrack = `${dataTrack.items[0].track.name} by ${dataTrack.items[0].track.artists[0].name}`;
-
-        // fetching top albums
-        const albumsResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|top|albums"}`, {
-          credentials: 'include', // Include credentials (cookies) in the request
-        });
-        const dataAlbums = await albumsResponse.json();
-        wrappedInfo.topAlbums = dataAlbums;
-
-        // fetching top artists
-        const artistsResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|top|artists?limit=5"}`, {
-          credentials: 'include', // Include credentials (cookies) in the request
-        });
-        let dataArtists = await artistsResponse.json();
-        dataArtists = dataArtists.items.map((item: any) => [item.name, item.images[0].url, item.fav_track]);
-        wrappedInfo.topArtists = dataArtists;
-
-        // fetching user description
-        const descriptionResponse = await fetch(`http://localhost:8000/spotify/get-data/${"me|description"}`, {
-          credentials: 'include', // Include credentials (cookies) in the request
-        });
-        const dataDescription = await descriptionResponse.json();
-        wrappedInfo.userDescription = dataDescription;
-
-        setWrappedInfo({...wrappedInfo});
+        const wrappedsData = await wrappedsRes.json();
+        // if there are no wrappeds, generate one
+        if (wrappedsData.items.length === 0) {;
+          const newWrappedRes = await fetch("http://localhost:8000/spotify/create-wrapped", {
+            credentials: "include",
+          });
+          const newWrappedData = await newWrappedRes.json();
+          setWrappedInfo({...parseWrapped(newWrappedData)});
+          console.log("New wrapped:");
+          console.log(newWrappedData);
+        } else {
+          setWrappedInfo({...parseWrapped(wrappedsData.items[0])});
+          console.log("All past wrappeds:");
+          console.log(wrappedsData.items);
+        }
+        setLoggedIn(true);
 
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
         console.log("Error occurred fetching")
+        push("/login");
       }
     };
 
@@ -81,10 +76,20 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full">
-      <UserBlock username={displayName || ""} className="grow mb-16" userImage={userImage || ""}/>
-      <Wrapped wrapped={wrappedInfo} />
-      <Footer topArtists={wrappedInfo.topArtists}></Footer>
+    <div className="w-full flex flex-col items-center">
+      {loggedIn && <>
+        <div className="flex mb-16 items-center w-full max-w-[35rem]">
+          <UserBlock username={displayName || ""} className="grow" userImage={userImage || ""}/>
+          <Button
+            onPress={() => generate()}
+            className="bg-primary rounded-lg font-bold text-white"
+          >
+            {lang.generateNew}
+          </Button>
+        </div>
+        <Wrapped wrapped={wrappedInfo} />
+        <Footer topArtists={wrappedInfo.topArtists}></Footer>
+      </>}
     </div>
   )
 }

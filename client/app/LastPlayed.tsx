@@ -14,9 +14,9 @@ export default function LastPlayed(props: {
       <div className="flex flex-wrap gap-2 text-3xl">
         <p>{lang.your}</p>
         <p className="text-secondary">
-          Last Played
+          {lang.lastPlayed}
         </p>
-        <p>Song</p>
+        <p>{lang.song}:</p>
       </div>
       <p className="text-2xl text-primary mt-12">
         {recentTrack || "Song"}

@@ -5,6 +5,10 @@ import Top5Albums from "./Top5Albums";
 import LastPlayed from "./LastPlayed";
 import TopGenre from "./TopGenre";
 import UserDescription from "./UserDescription";
+import Acousticness from "./Acousticness";
+import Diversity from "./Diversity";
+import Danceability from "./Danceability";
+import WrappedCover from "./WrappedCover";
 
 
 export default function Wrapped(props: {
@@ -22,11 +26,15 @@ export default function Wrapped(props: {
 
   return (
     <Carousel slides={[
+      <WrappedCover />,
       <Top5Artists topArtists={topArtists} />,
       <Top5Albums topAlbums={topAlbums} />,
       <LastPlayed recentTrack={recentTrack ?? ""} />,
-      <TopGenre topGenres={topGenres ?? ""} genreDiversity={genreDiversity ?? 50} />,
+      <TopGenre topGenres={topGenres ?? ""} />,
+      <Diversity diversity={genreDiversity} />,
       <UserDescription description={userDescription ?? ""} />,
+      <Acousticness />,
+      <Danceability />,
     ]} />
   )
 }

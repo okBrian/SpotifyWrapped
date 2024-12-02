@@ -1,5 +1,5 @@
 "use client"
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 import Header from "./Header";
 import { Language } from "@/util/types";
 import { lang } from "@/util/languages";
@@ -15,6 +15,30 @@ export default function DarkModeProvider(props: {
 
   const [dark, setDark] = useState(true);
   const [language, setLanguage] = useState<Language>("English");
+
+  useEffect(() => {
+    const lsDark = localStorage.getItem("dark");
+    const lsLang = localStorage.getItem("lang");
+
+    if (lsDark) {
+      setDark(JSON.parse(lsDark));
+    }
+    if (lsLang) {
+      setLanguage(JSON.parse(lsLang));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!dark) {
+      localStorage.setItem("dark", JSON.stringify(dark));
+    }
+  }, [dark]);
+
+  useEffect(() => {
+    if (language !== "English") {
+      localStorage.setItem("lang", JSON.stringify(language));
+    }
+  }, [language]);
 
   return (
     <div className={"w-full h-full flex flex-col items-center transition" + (dark
