@@ -50,15 +50,13 @@ export default function Profile() {
     })();
   }
 
-  const deleteWrapped = (index: number) => {
+  const deleteWrapped = (id: string) => {
     (async () => {
-      await fetch(`http://localhost:8000/spotify/delete-wrapped/${wrappeds[index].id}`, {
+      await fetch(`http://localhost:8000/spotify/delete-wrapped/${id}`, {
         credentials: "include",
       });
+      setWrappeds([...wrappeds.filter(w => w.id !== id)]);
     })();
-
-    wrappeds.filter((_, i) => i !== index);
-    setWrappeds([...wrappeds]);
   }
 
   const openWrapped = (index: number) => {
@@ -105,7 +103,7 @@ export default function Profile() {
                 })()}
               </Button>
               <Button
-                onPress={() => deleteWrapped(i)}
+                onPress={() => deleteWrapped(w.id)}
                 className="bg-red-500 font-bold text-white rounded-lg"
               >
                 Delete
