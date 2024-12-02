@@ -49,7 +49,7 @@ export default function Top5Artists(props: {
                   {lang.pop}:
                 </p>
                 <p className="text-2xl text-primary mb-4">
-                  {topArtists[i].popularity}
+                  {topArtists[i].popularity}%
                 </p>
               </div>
             }
