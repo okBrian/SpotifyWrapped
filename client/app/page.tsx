@@ -4,11 +4,11 @@ import UserBlock from "./UserBlock";
 import { useContext, useEffect, useState } from 'react';
 import { DEFAULT_WRAPPED, WrappedInfo } from "@/util/types";
 import Wrapped from "./Wrapped";
+import Footer from "./Footer"
 import { parseWrapped } from "@/util/helpers";
 import { Button } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { LangContext } from "./DarkModeProvider";
-
 
 export default function Home() {
   const [displayName, setDisplayName] = useState<string | null>(null);
@@ -88,6 +88,7 @@ export default function Home() {
           </Button>
         </div>
         <Wrapped wrapped={wrappedInfo} />
+        <Footer topArtists={wrappedInfo.topArtists}></Footer>
       </>}
     </div>
   )
