@@ -12,7 +12,7 @@ export default function Carousel(props: {
 
   return (
     <div className="flex flex-col gap-4 justify-center items-center max-w-full h-[35rem]">
-      <div className="grow min-w-0 w-full max-w-full">
+      <div className="grow min-w-0 w-full max-w-full flex justify-center">
         {slides[index]}
       </div>
 

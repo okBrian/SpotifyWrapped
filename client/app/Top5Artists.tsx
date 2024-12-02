@@ -18,7 +18,7 @@ export default function Top5Artists(props: {
         <p className="text-secondary">
           {lang.top5}
         </p>
-        <p>{lang.artists}</p>
+        <p>{lang.artists}:</p>
       </div>
       
       <div className="flex gap-4 overflow-x-scroll px-3 py-6 grow">

@@ -18,7 +18,7 @@ export default function Top5Albums(props: {
         <p className="text-secondary">
           {lang.top5}
         </p>
-        <p>Albums</p>
+        <p>Albums:</p>
       </div>
       
       <div className="flex gap-4 overflow-x-scroll px-3 py-6 grow">

@@ -1,5 +1,3 @@
-import UserDescription from "@/app/UserDescription";
-
 export type Language = "English" | "Chinese" | "Korean";
 
 export type LanguageType = {
