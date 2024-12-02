@@ -1,7 +1,8 @@
 "use client"; // This makes the component a Client Component
 
 import { Button } from '@nextui-org/react';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { LangContext } from '../DarkModeProvider';
 
 
 export default function Login() {
@@ -9,6 +10,7 @@ export default function Login() {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
+  const lang = useContext(LangContext);
 
   // Fetch the authentication URL when the component mounts
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function Login() {
     <div className="w-full h-full relative overflow-hidden pt-32">
       <div className="flex flex-wrap gap-2 text-5xl w-min whitespace-nowrap mb-12">
         <p className="z-10">
-          Your
+          {lang.your}
         </p>
         <p className="text-secondary z-10">
           2024
@@ -81,18 +83,18 @@ export default function Login() {
           <Button
             className="bg-variant rounded-lg text-white z-10"
           >
-            Login with Spotify
+            {lang.loginWith} Spotify
           </Button>
         </a>
       ) : (
         <Button
           className="bg-variant rounded-lg text-white z-10"
         >
-          Login with Spotify
+          {lang.loginWith} Spotify
         </Button>
       )}
 
-      <p className="absolute bottom-0 right-0 text-faint-gray-light dark:text-faint-gray-dark text-[40rem] font-bold leading-none pb-48">
+      <p className="absolute bottom-0 right-0 text-faint-gray-light dark:text-faint-gray-dark select-none text-[15rem] md:text-[40rem] font-bold leading-none pb-48">
         24
       </p>
     </div>

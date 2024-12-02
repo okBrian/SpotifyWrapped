@@ -45,6 +45,8 @@ export type LanguageType = {
   balanced: string,
   diverse2: string,
   universal: string,
+  viewProfile: string,
+  loginWith: string,
 };
 
 export type Album = {

@@ -25,7 +25,7 @@ export default function Acousticness() {
           <p className="text-2xl text-primary w-48">
             {lang.acousticness}:
           </p>
-          <FillBar width="w-[50px]" />
+          <FillBar width="w-1/4" />
         </div>
 
         <p className="text-2xl text-primary">
