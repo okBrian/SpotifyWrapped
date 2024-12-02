@@ -2,6 +2,7 @@ import { Language, LanguageType } from "./types";
 
 
 const ENGLISH: LanguageType = {
+  lang: "English",
   minutesListened: 'Minutes Listened',
   topGenre: 'Top Genre',
   your: 'Your',
@@ -11,6 +12,7 @@ const ENGLISH: LanguageType = {
 };
 
 const CHINESE: LanguageType = {
+  lang: "Chinese",
   minutesListened: '收听时长',
   topGenre: '大音乐风格',
   your: '你喜欢的',
@@ -20,6 +22,7 @@ const CHINESE: LanguageType = {
 };
 
 const KOREAN: LanguageType = {
+  lang: "Korean",
   minutesListened: '收听分钟数',
   topGenre: '热门流派',
   your: '你的',

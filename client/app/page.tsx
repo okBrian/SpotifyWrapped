@@ -9,7 +9,7 @@ import { parseWrapped } from "@/util/helpers";
 
 
 export default function Home() {
-  const [displayName, setDisplayName] = useState<string | null>("John Doe");
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [userImage, setUserImage] = useState<string | null>(null);
   const [wrappedInfo, setWrappedInfo] = useState<WrappedInfo>(DEFAULT_WRAPPED);
 
@@ -42,8 +42,8 @@ export default function Home() {
           console.log(newWrappedData);
         } else {
           setWrappedInfo({...parseWrapped(wrappedsData.items[0])});
-          console.log("Most recent wrapped:");
-          console.log(wrappedsData.items[0]);
+          console.log("All past wrappeds:");
+          console.log(wrappedsData.items);
         }
 
       } catch (error) {

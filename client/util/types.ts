@@ -3,6 +3,7 @@ import UserDescription from "@/app/UserDescription";
 export type Language = "English" | "Chinese" | "Korean";
 
 export type LanguageType = {
+  lang: Language,
   minutesListened: string,
   topGenre: string,
   your: string,
@@ -27,6 +28,12 @@ export type Genre = {
   name: string,
 };
 
+export type UserDescriptionType = {
+  english: string,
+  chinese: string,
+  korean: string,
+}
+
 export type WrappedInfo = {
   id: string,
   timestamp: number,
@@ -35,7 +42,7 @@ export type WrappedInfo = {
   topAlbums: Album[],
   topGenres: Genre[],
   recentTrack: string,
-  userDescription: string,
+  userDescription: UserDescriptionType,
 };
 
 export const DEFAULT_ARTIST: Artist = {
@@ -80,5 +87,9 @@ export const DEFAULT_WRAPPED: WrappedInfo = {
     DEFAULT_GENRE,
   ],
   recentTrack: "Most recent track",
-  userDescription: "User description",
+  userDescription: {
+    english: "English description",
+    chinese: "Chinese description",
+    korean: "Korean description",
+  },
 };
