@@ -7,6 +7,7 @@ import Wrapped from "../Wrapped";
 import CenteredModal from "../CenteredModal";
 import { parseWrapped } from "@/util/helpers";
 import DivideY from "../DivideY";
+import { useRouter } from "next/navigation";
 
 export default function Profile() {
   const [displayName, setDisplayName] = useState("");
@@ -14,6 +15,8 @@ export default function Profile() {
   const [wrappeds, setWrappeds] = useState<WrappedInfo[]>([]);
   const [wrappedOpen, setWrappedOpen] = useState(false);
   const [openIndex, setOpenIndex] = useState(0);
+
+  const { push } = useRouter();
 
   useEffect(() => {
     (async () => {
@@ -39,8 +42,23 @@ export default function Profile() {
   }, []);
 
   const handleDelete = () => {
-    // TODO: fetch endpoint for deleting account
-    console.log("delete pressed");
+    (async () => {
+      await fetch("http://localhost:8000/spotify/delete-account", {
+        credentials: "include",
+      });
+      push("/login");
+    })();
+  }
+
+  const deleteWrapped = (index: number) => {
+    (async () => {
+      await fetch(`http://localhost:8000/spotify/delete-wrapped/${wrappeds[index].id}`, {
+        credentials: "include",
+      });
+    })();
+
+    wrappeds.filter((_, i) => i !== index);
+    setWrappeds([...wrappeds]);
   }
 
   const openWrapped = (index: number) => {
@@ -71,17 +89,26 @@ export default function Profile() {
         <h2 className="text-center text-xl font-bold">
           Past Wrappeds
         </h2>
+        <p className="text-center text-primary italic">
+          Click on one of your past wrappeds to view it!
+        </p>
         <div className="flex flex-col divide-y divide-light-border dark:divide-dark-border w-full">
           {wrappeds.map((w, i) =>
-            <div key={i}>
+            <div key={i} className="flex gap-4 items-center">
               <Button
                 onPress={() => openWrapped(i)}
-                className="h-16 bg-faint-gray-light dark:bg-faint-gray-dark rounded-lg w-full justify-start"
+                className="h-16 bg-faint-gray-light dark:bg-faint-gray-dark rounded-lg w-full justify-start grow"
               >
                 {(() => {
                   const date = new Date(w.timestamp);
                   return `${date.getMonth() + 1}/${date.getDay() + 1}/${date.getFullYear()} Wrapped${i === 0 ? " — Latest" : ""}`;
                 })()}
+              </Button>
+              <Button
+                onPress={() => deleteWrapped(i)}
+                className="bg-red-500 font-bold text-white rounded-lg"
+              >
+                Delete
               </Button>
             </div>
           )}

@@ -11,5 +11,5 @@ urlpatterns = [
     path('create-wrapped', CreateWrapped.as_view(), name = 'create-wrapped'),
     path('get-wrappeds', GetWrappeds.as_view(), name = 'get-wrappeds'),
     path('delete-account', DeleteAccount.as_view(), name = 'delete-account'),
-    path('delete-wrapped/<str:wrap_id>', DeleteWrapped.as_view(), name = 'delete-wrapped')
+    path('delete-wrapped/<str:query>', DeleteWrapped.as_view(), name = 'delete-wrapped')
 ]

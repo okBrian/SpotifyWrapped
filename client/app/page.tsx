@@ -5,13 +5,29 @@ import { useEffect, useState } from 'react';
 import { DEFAULT_WRAPPED, WrappedInfo } from "@/util/types";
 import Wrapped from "./Wrapped";
 import { parseWrapped } from "@/util/helpers";
-
+import { Button } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 
 
 export default function Home() {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [userImage, setUserImage] = useState<string | null>(null);
   const [wrappedInfo, setWrappedInfo] = useState<WrappedInfo>(DEFAULT_WRAPPED);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const { push } = useRouter();
+
+  const generate = () => {
+    (async () => {
+      const newWrappedRes = await fetch("http://localhost:8000/spotify/create-wrapped", {
+        credentials: "include",
+      });
+      const newWrappedData = await newWrappedRes.json();
+      setWrappedInfo({...parseWrapped(newWrappedData)});
+      console.log("Pressed generate button, new wrapped:");
+      console.log(newWrappedData);
+    })();
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,10 +61,12 @@ export default function Home() {
           console.log("All past wrappeds:");
           console.log(wrappedsData.items);
         }
+        setLoggedIn(true);
 
       } catch (error) {
         console.error("Error fetching user data:", error);
         console.log("Error occurred fetching")
+        push("/login");
       }
     };
 
@@ -56,9 +74,19 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full">
-      <UserBlock username={displayName || ""} className="grow mb-16" userImage={userImage || ""}/>
-      <Wrapped wrapped={wrappedInfo} />
+    <div className="w-full flex flex-col items-center">
+      {loggedIn && <>
+        <div className="flex mb-16 items-center w-full max-w-[35rem]">
+          <UserBlock username={displayName || ""} className="grow" userImage={userImage || ""}/>
+          <Button
+            onPress={() => generate()}
+            className="bg-primary rounded-lg font-bold text-white"
+          >
+            Generate New Wrapped
+          </Button>
+        </div>
+        <Wrapped wrapped={wrappedInfo} />
+      </>}
     </div>
   )
 }
